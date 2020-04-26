@@ -21,6 +21,7 @@
 		<!-- <logback.version>1.2.3</logback.version> -->
 		<spark.version>3.0.0-preview2</spark.version>
 		<jupiter.engine.version>5.0.0-M1</jupiter.engine.version>
+		<stanford.dependency.parser.version>3.6.0</stanford.dependency.parser.version>
 	</properties>
 
 	<dependencies>
@@ -37,6 +38,14 @@
 			<version>${jupiter.engine.version}</version>
 			<scope>test</scope>
 		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/edu.stanford.nlp/stanford-parser -->
+		<dependency>
+			<groupId>edu.stanford.nlp</groupId>
+			<artifactId>stanford-parser</artifactId>
+			<version>${stanford.dependency.parser.version}</version>
+		</dependency>
+
 
 		<!-- <dependency> <groupId>ch.qos.logback</groupId> <artifactId>logback-classic</artifactId> 
 			<version>${logback.version}</version> </dependency> -->

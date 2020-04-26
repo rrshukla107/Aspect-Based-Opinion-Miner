@@ -1,4 +1,4 @@
-package com.rahul.aspect_based_miner.core;
+package com.rahul.aspect_based_miner;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one or more
@@ -37,7 +37,6 @@ public final class JavaWordCount {
 
 	public static void main(String[] args) throws Exception {
 
-		
 		logger.info("#############################");
 		logger.info("#############################");
 		logger.info("#############################");
