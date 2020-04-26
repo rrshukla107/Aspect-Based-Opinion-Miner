@@ -24,22 +24,6 @@ public class FeatureLevelMiningEngineTest {
 	private OpinionMiningEngine engine;
 
 	@Test
-	public void whenAlgorithmsGiven_allExtractorsPresent() {
-
-		Algorithm dummyAlgo1 = () -> Arrays.asList((aspect, gsf) -> Collections.emptyList(),
-				(aspect, gsf) -> Collections.emptyList());
-
-		Algorithm dummyAlgo2 = () -> Arrays.asList((aspect, gsf) -> Collections.emptyList(),
-				(aspect, gsf) -> Collections.emptyList(), (aspect, gsf) -> Collections.emptyList());
-
-		Algorithm dummyAlgo3 = () -> Arrays.asList((aspect, gsf) -> Collections.emptyList());
-
-		this.engine = new FeatureLevelMiningEngine(List.of(dummyAlgo1, dummyAlgo2, dummyAlgo3), 3);
-
-		assertEquals(6, this.engine.getExtractors().size());
-	}
-
-	@Test
 	public void whenExtractionComplete_FutureComplete() {
 
 		CountDownLatch latch = new CountDownLatch(1);
@@ -58,16 +42,17 @@ public class FeatureLevelMiningEngineTest {
 
 		this.engine = new FeatureLevelMiningEngine(List.of(dummyAlgo1, dummyAlgo2), 4);
 
-		CompletableFuture<MiningResult> process = this.engine.process(new Aspect(), new ArrayList<String>());
+		CompletableFuture<MiningResult> process = this.engine.process(new Aspect(),
+				Arrays.asList("sentence 1", "sentence 2"));
 
 		process.thenAccept(miningResult -> {
-			assertEquals(6, miningResult.getOpinionWord().size());
+			assertEquals(12, miningResult.getOpinionWord().size());
 			assertTrue(miningResult.getOpinionWord().contains(new OpinionWord("test3")));
 			latch.countDown();
 		});
 
 		try {
-			latch.await(10000, TimeUnit.SECONDS);
+			latch.await(100000, TimeUnit.SECONDS);
 		} catch (InterruptedException e) {
 			fail();
 		}

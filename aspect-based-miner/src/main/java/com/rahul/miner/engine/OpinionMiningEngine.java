@@ -10,6 +10,4 @@ public interface OpinionMiningEngine {
 
 	CompletableFuture<MiningResult> process(Aspect feature, List<String> sentences);
 
-	List<OpinionWordExtractor> getExtractors();
-
 }

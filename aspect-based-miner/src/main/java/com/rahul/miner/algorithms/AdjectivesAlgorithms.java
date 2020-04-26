@@ -4,9 +4,11 @@ import java.util.List;
 
 import com.rahul.miner.opinion_word_extractors.OpinionWordExtractor;
 
-@FunctionalInterface
-public interface Algorithm {
+public class AdjectivesAlgorithms implements Algorithm {
 
-	List<OpinionWordExtractor> getExtractors();
+	@Override
+	public List<OpinionWordExtractor> getExtractors() {
+		return null;
+	}
 
 }
