@@ -15,6 +15,7 @@ import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import com.rahul.miner.algorithms.AdjectivesAlgorithms;
 import com.rahul.miner.algorithms.Algorithm;
 import com.rahul.miner.aspect.Aspect;
 import com.rahul.miner.opinion_word_extractors.OpinionWord;
@@ -48,7 +49,31 @@ public class FeatureLevelMiningEngineTest {
 		this.engine = new FeatureLevelMiningEngine(List.of(dummyAlgo1, dummyAlgo2), 4,
 				LexicalizedParser.loadModel(grammar, options));
 
-		CompletableFuture<MiningResult> process = this.engine.process(new Aspect(),
+		CompletableFuture<MiningResult> process = this.engine.process(null, Arrays.asList("sentence 1", "sentence 2"));
+
+		process.thenAccept(miningResult -> {
+			assertEquals(12, miningResult.getOpinionWord().size());
+			assertTrue(miningResult.getOpinionWord().contains(new OpinionWord("test3")));
+			latch.countDown();
+		});
+
+		try {
+			latch.await(100000, TimeUnit.SECONDS);
+		} catch (InterruptedException e) {
+			fail();
+		}
+
+	}
+
+	@Test
+	public void test() {
+
+		CountDownLatch latch = new CountDownLatch(1);
+
+		this.engine = new FeatureLevelMiningEngine(List.of(new AdjectivesAlgorithms()), 4,
+				LexicalizedParser.loadModel(grammar, options));
+
+		CompletableFuture<MiningResult> process = this.engine.process(new Aspect(Arrays.asList("abc", "cde")),
 				Arrays.asList("sentence 1", "sentence 2"));
 
 		process.thenAccept(miningResult -> {

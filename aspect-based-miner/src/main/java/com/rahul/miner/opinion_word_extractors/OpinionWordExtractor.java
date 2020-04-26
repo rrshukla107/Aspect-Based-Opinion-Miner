@@ -9,6 +9,6 @@ import edu.stanford.nlp.trees.GrammaticalStructure;
 @FunctionalInterface
 public interface OpinionWordExtractor {
 
-	List<OpinionWord> extract(Aspect aspect, GrammaticalStructure gsf);
+	List<OpinionWord> extract(Aspect aspect, GrammaticalStructure gs);
 
 }
