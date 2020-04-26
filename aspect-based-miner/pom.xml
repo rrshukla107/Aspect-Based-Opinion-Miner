@@ -47,6 +47,13 @@
 			<version>${stanford.dependency.parser.version}</version>
 		</dependency>
 
+		<dependency>
+			<groupId>edu.stanford.nlp</groupId>
+			<artifactId>stanford-corenlp</artifactId>
+			<version>${stanford.dependency.parser.version}</version>
+			<classifier>models</classifier>
+		</dependency>
+
 
 		<!-- <dependency> <groupId>ch.qos.logback</groupId> <artifactId>logback-classic</artifactId> 
 			<version>${logback.version}</version> </dependency> -->

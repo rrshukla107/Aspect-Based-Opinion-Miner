@@ -19,9 +19,14 @@ import com.rahul.miner.algorithms.Algorithm;
 import com.rahul.miner.aspect.Aspect;
 import com.rahul.miner.opinion_word_extractors.OpinionWord;
 
+import edu.stanford.nlp.parser.lexparser.LexicalizedParser;
+
 public class FeatureLevelMiningEngineTest {
 
 	private OpinionMiningEngine engine;
+
+	private static String grammar = "edu/stanford/nlp/models/lexparser/englishPCFG.ser.gz";
+	private static String[] options = { "-maxLength", "80", "-retainTmpSubcategories" };
 
 	@Test
 	public void whenExtractionComplete_FutureComplete() {
@@ -40,7 +45,8 @@ public class FeatureLevelMiningEngineTest {
 		Algorithm dummyAlgo2 = () -> Arrays.asList((aspect, gsf) -> Arrays.asList(new OpinionWord("test5")),
 				(aspect, gsf) -> Arrays.asList(new OpinionWord("test6")));
 
-		this.engine = new FeatureLevelMiningEngine(List.of(dummyAlgo1, dummyAlgo2), 4);
+		this.engine = new FeatureLevelMiningEngine(List.of(dummyAlgo1, dummyAlgo2), 4,
+				LexicalizedParser.loadModel(grammar, options));
 
 		CompletableFuture<MiningResult> process = this.engine.process(new Aspect(),
 				Arrays.asList("sentence 1", "sentence 2"));

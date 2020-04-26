@@ -11,14 +11,27 @@ import com.rahul.miner.algorithms.AlgorithmRunner;
 import com.rahul.miner.aspect.Aspect;
 import com.rahul.miner.opinion_word_extractors.OpinionWord;
 
+import edu.stanford.nlp.parser.lexparser.LexicalizedParser;
+import edu.stanford.nlp.trees.GrammaticalStructure;
+import edu.stanford.nlp.trees.GrammaticalStructureFactory;
+import edu.stanford.nlp.trees.Tree;
+import edu.stanford.nlp.trees.TreebankLanguagePack;
+
 public class SingleSentenceAlgorithmRunner implements AlgorithmRunner {
 
 	private Algorithm algorithm;
 	private ExecutorService executorService;
+	private LexicalizedParser parser;
+	private TreebankLanguagePack tlp;
+	private GrammaticalStructureFactory gsf;
 
-	public SingleSentenceAlgorithmRunner(ExecutorService executorService, Algorithm algorithm) {
+	public SingleSentenceAlgorithmRunner(ExecutorService executorService, Algorithm algorithm,
+			LexicalizedParser parser) {
 		this.executorService = executorService;
 		this.algorithm = algorithm;
+		this.parser = parser;
+		this.tlp = parser.getOp().langpack();
+		this.gsf = tlp.grammaticalStructureFactory();
 	}
 
 	@Override
@@ -29,10 +42,12 @@ public class SingleSentenceAlgorithmRunner implements AlgorithmRunner {
 
 		for (String s : sentences) {
 
+			GrammaticalStructure structure = gsf.newGrammaticalStructure(parser.parse(s));
+
 			this.algorithm.getExtractors().forEach(extractor -> {
 				CompletableFuture<List<OpinionWord>> future = new CompletableFuture<>();
 				pendingExtractions.add(future);
-				this.executorService.execute(() -> future.complete(extractor.extract(aspect, null)));
+				this.executorService.execute(() -> future.complete(extractor.extract(aspect, structure)));
 
 			});
 

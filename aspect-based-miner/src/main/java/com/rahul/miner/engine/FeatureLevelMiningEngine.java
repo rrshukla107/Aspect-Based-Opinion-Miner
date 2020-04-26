@@ -11,14 +11,18 @@ import com.rahul.miner.algorithms.AlgorithmRunner;
 import com.rahul.miner.aspect.Aspect;
 import com.rahul.miner.opinion_word_extractors.OpinionWord;
 
+import edu.stanford.nlp.parser.lexparser.LexicalizedParser;
+
 public class FeatureLevelMiningEngine implements OpinionMiningEngine {
 
 	private ExecutorService executorService;
 	private List<Algorithm> algorithms;
+	private LexicalizedParser parser;
 
-	public FeatureLevelMiningEngine(List<Algorithm> algorithms, int numThreads) {
+	public FeatureLevelMiningEngine(List<Algorithm> algorithms, int numThreads, LexicalizedParser parser) {
 
 		this.algorithms = algorithms;
+		this.parser = parser;
 		this.executorService = Executors.newFixedThreadPool(numThreads);
 
 	}
@@ -26,9 +30,9 @@ public class FeatureLevelMiningEngine implements OpinionMiningEngine {
 	@Override
 	public CompletableFuture<MiningResult> process(Aspect feature, List<String> sentences) {
 
-		CompletableFuture<MiningResult> result = new CompletableFuture<MiningResult>();
+		CompletableFuture<MiningResult> result = new CompletableFuture<>();
 		List<CompletableFuture<List<OpinionWord>>> runningAlgorithms = this.algorithms.stream().map(algo -> {
-			AlgorithmRunner runner = new SingleSentenceAlgorithmRunner(executorService, algo);
+			AlgorithmRunner runner = new SingleSentenceAlgorithmRunner(executorService, algo, parser);
 			return runner.run(feature, sentences);
 		}).collect(Collectors.toList());
 
