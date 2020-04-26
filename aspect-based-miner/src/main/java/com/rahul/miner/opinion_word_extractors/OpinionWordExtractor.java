@@ -1,6 +1,8 @@
-package com.rahul.aspect_based_miner.opinion_word_extractors;
+package com.rahul.miner.opinion_word_extractors;
 
 import java.util.List;
+
+import com.rahul.miner.aspect.Aspect;
 
 import edu.stanford.nlp.trees.GrammaticalStructureFactory;
 

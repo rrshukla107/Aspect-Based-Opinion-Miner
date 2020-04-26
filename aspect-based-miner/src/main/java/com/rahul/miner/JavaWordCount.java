@@ -1,4 +1,4 @@
-package com.rahul.aspect_based_miner;
+package com.rahul.miner;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one or more
