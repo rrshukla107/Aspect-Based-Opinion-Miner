@@ -6,7 +6,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.stream.Collectors;
 
-import com.rahul.miner.algorithms.Algorithm;
+import com.rahul.miner.algorithms.AlgorithmFamily;
 import com.rahul.miner.algorithms.AlgorithmRunner;
 import com.rahul.miner.aspect.Aspect;
 import com.rahul.miner.opinion_word_extractors.OpinionWord;
@@ -19,13 +19,13 @@ import edu.stanford.nlp.trees.TreebankLanguagePack;
 
 public class SingleSentenceAlgorithmRunner implements AlgorithmRunner {
 
-	private Algorithm algorithm;
+	private AlgorithmFamily algorithm;
 	private ExecutorService executorService;
 	private LexicalizedParser parser;
 	private TreebankLanguagePack tlp;
 	private GrammaticalStructureFactory gsf;
 
-	public SingleSentenceAlgorithmRunner(ExecutorService executorService, Algorithm algorithm,
+	public SingleSentenceAlgorithmRunner(ExecutorService executorService, AlgorithmFamily algorithm,
 			LexicalizedParser parser) {
 		this.executorService = executorService;
 		this.algorithm = algorithm;

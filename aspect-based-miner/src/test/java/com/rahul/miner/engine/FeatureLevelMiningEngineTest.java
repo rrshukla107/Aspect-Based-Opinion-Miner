@@ -20,7 +20,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import com.rahul.miner.algorithms.AdjectivesAlgorithms;
-import com.rahul.miner.algorithms.Algorithm;
+import com.rahul.miner.algorithms.AlgorithmFamily;
 import com.rahul.miner.aspect.Aspect;
 import com.rahul.miner.opinion_word_extractors.OpinionWord;
 
@@ -39,7 +39,7 @@ public class FeatureLevelMiningEngineTest {
 
 		CountDownLatch latch = new CountDownLatch(1);
 
-		Algorithm dummyAlgo1 = () -> Arrays.asList((aspect, gsf) -> {
+		AlgorithmFamily dummyAlgo1 = () -> Arrays.asList((aspect, gsf) -> {
 			try {
 				TimeUnit.SECONDS.sleep(1);
 			} catch (InterruptedException e) {
@@ -48,7 +48,7 @@ public class FeatureLevelMiningEngineTest {
 			return Arrays.asList(new OpinionWord("test1"), new OpinionWord("test2"));
 		}, (aspect, gsf) -> Arrays.asList(new OpinionWord("test3"), new OpinionWord("test4")));
 
-		Algorithm dummyAlgo2 = () -> Arrays.asList((aspect, gsf) -> Arrays.asList(new OpinionWord("test5")),
+		AlgorithmFamily dummyAlgo2 = () -> Arrays.asList((aspect, gsf) -> Arrays.asList(new OpinionWord("test5")),
 				(aspect, gsf) -> Arrays.asList(new OpinionWord("test6")));
 
 		this.engine = new FeatureLevelMiningEngine(List.of(dummyAlgo1, dummyAlgo2), 4,

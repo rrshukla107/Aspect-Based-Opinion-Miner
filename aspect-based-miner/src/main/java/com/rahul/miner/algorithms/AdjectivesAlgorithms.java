@@ -11,7 +11,7 @@ import com.rahul.miner.opinion_word_extractors.OpinionWordExtractor;
 import edu.stanford.nlp.trees.GrammaticalStructure;
 import edu.stanford.nlp.trees.TypedDependency;
 
-public class AdjectivesAlgorithms implements Algorithm {
+public class AdjectivesAlgorithms implements AlgorithmFamily {
 
 	@Override
 	public List<OpinionWordExtractor> getExtractors() {
