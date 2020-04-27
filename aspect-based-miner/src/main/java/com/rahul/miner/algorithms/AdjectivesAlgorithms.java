@@ -15,33 +15,133 @@ public class AdjectivesAlgorithms implements Algorithm {
 
 	@Override
 	public List<OpinionWordExtractor> getExtractors() {
-		return List.of(this::algorithm1);
+		return List.of(new Algorithm1(), new Algorithm2());
 	}
 
-	List<OpinionWord> algorithm1(Aspect aspect, GrammaticalStructure gs) {
+	private class Algorithm1 implements OpinionWordExtractor {
 
-		List<OpinionWord> opinionWords = new ArrayList<>();
-		Collection<TypedDependency> td = gs.allTypedDependencies();
+		@Override
+		public List<OpinionWord> extract(Aspect aspect, GrammaticalStructure gs) {
 
-		for (String feature : aspect.getAspects()) {
-			String x = null, y = null, y1 = null;
+			List<OpinionWord> opinionWords = new ArrayList<>();
+			Collection<TypedDependency> td = gs.allTypedDependencies();
+
+			for (String feature : aspect.getAspects()) {
+				String x = null, y = null, y1 = null;
+
+				for (TypedDependency t : td) {
+					if (t.reln().getShortName().equals("cc") && t.dep().originalText().equals("but")) {
+						y = t.gov().originalText();
+						for (TypedDependency t1 : td) {
+							if (t1.reln().getShortName().equals("nsubj") && t1.gov().originalText().equals(y)) {
+								x = t1.dep().originalText();
+								if (x.equals("it") || x.equals(aspect)) {
+									opinionWords.add(NegationUtil.setNegationForWord(y, td));
+									break;
+								}
+							}
+						}
+					}
+				}
+
+			}
+
+			return opinionWords;
+
+		}
+
+		@Override
+		public String getName() {
+			return "algo 1";
+		}
+
+	}
+
+	private class Algorithm2 implements OpinionWordExtractor {
+
+		@Override
+		public List<OpinionWord> extract(Aspect aspect, GrammaticalStructure gs) {
+
+			List<OpinionWord> opinionWords = new ArrayList<>();
+			Collection<TypedDependency> td = gs.allTypedDependencies();
+
+			for (String feature : aspect.getAspects()) {
+				String y = null;
+
+				for (TypedDependency t : td) {
+					if (t.reln().getShortName().equals("amod") || t.reln().getShortName().equals("rcmod")
+							|| t.reln().getShortName().equals("advmod")) {
+						if (t.gov().originalText().equals(aspect)) {
+							y = t.dep().originalText().toString();
+//							System.out.println(aspect + " ****2.1 - " + y);
+							opinionWords.add(NegationUtil.setNegationForWord(y, td));
+
+							break;
+
+						}
+					}
+				}
+			}
+			return opinionWords;
+		}
+
+		@Override
+		public String getName() {
+			return "algo 2";
+		}
+
+	}
+
+	private class Algorithm3 implements OpinionWordExtractor {
+
+		@Override
+		public List<OpinionWord> extract(Aspect aspect, GrammaticalStructure gs) {
+
+			List<OpinionWord> opinionWords = new ArrayList<>();
+			Collection<TypedDependency> td = gs.allTypedDependencies();
+
+			for (String feature : aspect.getAspects()) {
+				for (TypedDependency t : td) {
+					if (t.reln().getShortName().equals("prep_like") && t.dep().originalText().equals(aspect)) {
+//						System.out.println(aspect + " ****3 - " + "like");
+						opinionWords.add(NegationUtil.setNegationForWord("like", td));
+
+					}
+				}
+			}
+			return opinionWords;
+		}
+
+		@Override
+		public String getName() {
+			return "algo 3";
+		}
+
+	}
+
+	private class Algorithm5 implements OpinionWordExtractor {
+
+		@Override
+		public List<OpinionWord> extract(Aspect aspect, GrammaticalStructure gs) {
+
+			List<OpinionWord> opinionWords = new ArrayList<>();
+			Collection<TypedDependency> td = gs.allTypedDependencies();
+
+			String x = null, y = null;
+
 			for (TypedDependency t : td) {
-				if (t.reln().getShortName().equals("cc") && t.dep().originalText().equals("but")) {
-					y = t.gov().originalText();
+				if (t.reln().getShortName().equals("root") && t.gov().originalText().equals("")) {
+					// "" --> empty for root element, i.e, ROOT
+					y = t.dep().originalText();
 					for (TypedDependency t1 : td) {
-						if (t1.reln().getShortName().equals("nsubj") && t1.gov().originalText().equals(y)) {
-							x = t1.dep().originalText();
-							if (x.equals("it") || x.equals(aspect)) {
-								System.out.println(aspect + " ****1 - " + y);
-								opinionWords.add(new OpinionWord(y));
-//								if (checkNegation(y, td)) {
-//									System.out.println("negation present in " + y);
-//									opinionWords.add(y)
-//									insertOpinionWord(aspect, y, true);
-//								} else {
-//									insertOpinionWord(aspect, y, false);
-//								}
+						if (t1.reln().getShortName().equals("nsubj") && t1.gov().originalText().equals(y)
+								&& t1.dep().originalText().equals(aspect)) {
+							for (TypedDependency t2 : td) {
+								if (t2.reln().getShortName().equals("cop") && t2.gov().originalText().equals(y)) {
+//									System.out.println(aspect + " ****5 - " + y);
+									opinionWords.add(NegationUtil.setNegationForWord(y, td));
 
+								}
 								break;
 							}
 						}
@@ -49,25 +149,48 @@ public class AdjectivesAlgorithms implements Algorithm {
 				}
 			}
 
+			return opinionWords;
 		}
-		return opinionWords;
+
+		@Override
+		public String getName() {
+			return "algo 5";
+		}
 	}
 
-	private boolean checkNegation(String word, Collection<TypedDependency> td) {
-		String y;
-		boolean flag = false;
+	private class Algorithm6 implements OpinionWordExtractor {
 
-		for (TypedDependency t : td) {
-			if (t.reln().getShortName().equals("neg") && t.gov().originalText().equals(word))
-				flag = true;
-			if (t.reln().getShortName().equals("conj_negcc") && t.dep().originalText().equals(word))
-				flag = true;
-			if (t.reln().getShortName().equals("pobj") && t.dep().originalText().equals(word)
-					&& t.gov().originalText().equals("not"))
-				flag = true;
+		@Override
+		public List<OpinionWord> extract(Aspect aspect, GrammaticalStructure gs) {
+
+			List<OpinionWord> opinionWords = new ArrayList<>();
+			Collection<TypedDependency> td = gs.allTypedDependencies();
+
+			String x = null, y = null;
+
+			for (TypedDependency t : td) {
+				if (t.reln().getShortName().equals("nsubj") && t.dep().originalText().equals(aspect)) {
+
+					x = t.gov().originalText();
+					for (TypedDependency t1 : td) {
+						if (t1.reln().getShortName().equals("acomp") && t1.gov().originalText().equals(x)) {
+							y = t.dep().originalText();
+//							System.out.println(aspect + " ****6 - " + y);
+							opinionWords.add(NegationUtil.setNegationForWord(y, td));
+							break;
+						}
+					}
+				}
+			}
+
+			return opinionWords;
 		}
 
-		return flag;
+		@Override
+		public String getName() {
+			return "algo 6";
+		}
+
 	}
 
 }

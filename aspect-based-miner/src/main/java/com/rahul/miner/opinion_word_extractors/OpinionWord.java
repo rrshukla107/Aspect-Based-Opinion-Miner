@@ -4,8 +4,15 @@ public class OpinionWord {
 
 	private String word;
 
+	private Boolean isNegation;
+
 	public OpinionWord(String word) {
 		this.word = word;
+	}
+
+	public OpinionWord(String word, Boolean isNegation) {
+		this.word = word;
+		this.isNegation = isNegation;
 	}
 
 	public String getWord() {
@@ -14,6 +21,10 @@ public class OpinionWord {
 
 	public void setWord(String word) {
 		this.word = word;
+	}
+
+	public Boolean getIsNegation() {
+		return isNegation;
 	}
 
 	@Override

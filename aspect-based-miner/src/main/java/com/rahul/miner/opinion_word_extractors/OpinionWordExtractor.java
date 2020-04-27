@@ -11,4 +11,8 @@ public interface OpinionWordExtractor {
 
 	List<OpinionWord> extract(Aspect aspect, GrammaticalStructure gs);
 
+	default String getName() {
+		return null;
+	};
+
 }
