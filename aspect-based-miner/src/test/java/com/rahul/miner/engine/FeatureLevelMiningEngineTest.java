@@ -4,6 +4,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -20,6 +24,7 @@ import com.rahul.miner.algorithms.Algorithm;
 import com.rahul.miner.aspect.Aspect;
 import com.rahul.miner.opinion_word_extractors.OpinionWord;
 
+import core.Preprocess;
 import edu.stanford.nlp.parser.lexparser.LexicalizedParser;
 
 public class FeatureLevelMiningEngineTest {
@@ -66,15 +71,30 @@ public class FeatureLevelMiningEngineTest {
 	}
 
 	@Test
-	public void test() {
+	public void test() throws IOException {
+
+		Preprocess preprocessor = new Preprocess(
+				"D:\\git\\Aspect-Based-Opinion-Miner\\aspect-based-miner\\src\\test\\resources\\Movie_Reviews.txt",
+				"D:\\git\\Aspect-Based-Opinion-Miner\\aspect-based-miner\\src\\test\\resources\\Movie_Reviews_Output.txt");
+
+		File file = new File(
+				"D:\\git\\Aspect-Based-Opinion-Miner\\aspect-based-miner\\src\\test\\resources\\Movie_Reviews_Output.txt");
+
+		BufferedReader br = new BufferedReader(new FileReader(file));
+
+		List<String> lines = new ArrayList<String>();
+		String line;
+		while ((line = br.readLine()) != null) {
+			lines.add(line);
+		}
 
 		CountDownLatch latch = new CountDownLatch(1);
 
 		this.engine = new FeatureLevelMiningEngine(List.of(new AdjectivesAlgorithms()), 4,
 				LexicalizedParser.loadModel(grammar, options));
 
-		CompletableFuture<MiningResult> process = this.engine.process(new Aspect(Arrays.asList("abc", "cde")),
-				Arrays.asList("sentence 1", "sentence 2"));
+		CompletableFuture<MiningResult> process = this.engine
+				.process(new Aspect(Arrays.asList("acting", "direction", "cast")), lines);
 
 		process.thenAccept(miningResult -> {
 			assertEquals(12, miningResult.getOpinionWord().size());

@@ -6,7 +6,7 @@ public class Aspect {
 
 	private List<String> aspects;
 
-	public Aspect(List<String> aspect) {
+	public Aspect(List<String> aspects) {
 		this.aspects = aspects;
 	}
 

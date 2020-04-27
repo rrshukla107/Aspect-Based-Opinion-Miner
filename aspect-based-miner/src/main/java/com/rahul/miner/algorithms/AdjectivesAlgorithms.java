@@ -15,7 +15,7 @@ public class AdjectivesAlgorithms implements Algorithm {
 
 	@Override
 	public List<OpinionWordExtractor> getExtractors() {
-		return List.of(new Algorithm1(), new Algorithm2());
+		return List.of(new Algorithm1(), new Algorithm2(), new Algorithm3(), new Algorithm5(), new Algorithm6());
 	}
 
 	private class Algorithm1 implements OpinionWordExtractor {
@@ -35,7 +35,8 @@ public class AdjectivesAlgorithms implements Algorithm {
 						for (TypedDependency t1 : td) {
 							if (t1.reln().getShortName().equals("nsubj") && t1.gov().originalText().equals(y)) {
 								x = t1.dep().originalText();
-								if (x.equals("it") || x.equals(aspect)) {
+								if (x.equals("it") || x.equals(feature)) {
+									System.out.println(feature + " ****1 - " + y);
 									opinionWords.add(NegationUtil.setNegationForWord(y, td));
 									break;
 								}
@@ -71,9 +72,9 @@ public class AdjectivesAlgorithms implements Algorithm {
 				for (TypedDependency t : td) {
 					if (t.reln().getShortName().equals("amod") || t.reln().getShortName().equals("rcmod")
 							|| t.reln().getShortName().equals("advmod")) {
-						if (t.gov().originalText().equals(aspect)) {
+						if (t.gov().originalText().equals(feature)) {
 							y = t.dep().originalText().toString();
-//							System.out.println(aspect + " ****2.1 - " + y);
+							System.out.println(feature + " ****2.1 - " + y);
 							opinionWords.add(NegationUtil.setNegationForWord(y, td));
 
 							break;
@@ -102,8 +103,8 @@ public class AdjectivesAlgorithms implements Algorithm {
 
 			for (String feature : aspect.getAspects()) {
 				for (TypedDependency t : td) {
-					if (t.reln().getShortName().equals("prep_like") && t.dep().originalText().equals(aspect)) {
-//						System.out.println(aspect + " ****3 - " + "like");
+					if (t.reln().getShortName().equals("prep_like") && t.dep().originalText().equals(feature)) {
+						System.out.println(feature + " ****3 - " + "like");
 						opinionWords.add(NegationUtil.setNegationForWord("like", td));
 
 					}
@@ -128,21 +129,22 @@ public class AdjectivesAlgorithms implements Algorithm {
 			Collection<TypedDependency> td = gs.allTypedDependencies();
 
 			String x = null, y = null;
+			for (String feature : aspect.getAspects()) {
+				for (TypedDependency t : td) {
+					if (t.reln().getShortName().equals("root") && t.gov().originalText().equals("")) {
+						// "" --> empty for root element, i.e, ROOT
+						y = t.dep().originalText();
+						for (TypedDependency t1 : td) {
+							if (t1.reln().getShortName().equals("nsubj") && t1.gov().originalText().equals(y)
+									&& t1.dep().originalText().equals(feature)) {
+								for (TypedDependency t2 : td) {
+									if (t2.reln().getShortName().equals("cop") && t2.gov().originalText().equals(y)) {
+										System.out.println(feature + " ****5 - " + y);
+										opinionWords.add(NegationUtil.setNegationForWord(y, td));
 
-			for (TypedDependency t : td) {
-				if (t.reln().getShortName().equals("root") && t.gov().originalText().equals("")) {
-					// "" --> empty for root element, i.e, ROOT
-					y = t.dep().originalText();
-					for (TypedDependency t1 : td) {
-						if (t1.reln().getShortName().equals("nsubj") && t1.gov().originalText().equals(y)
-								&& t1.dep().originalText().equals(aspect)) {
-							for (TypedDependency t2 : td) {
-								if (t2.reln().getShortName().equals("cop") && t2.gov().originalText().equals(y)) {
-//									System.out.println(aspect + " ****5 - " + y);
-									opinionWords.add(NegationUtil.setNegationForWord(y, td));
-
+									}
+									break;
 								}
-								break;
 							}
 						}
 					}
@@ -167,17 +169,18 @@ public class AdjectivesAlgorithms implements Algorithm {
 			Collection<TypedDependency> td = gs.allTypedDependencies();
 
 			String x = null, y = null;
+			for (String feature : aspect.getAspects()) {
+				for (TypedDependency t : td) {
+					if (t.reln().getShortName().equals("nsubj") && t.dep().originalText().equals(feature)) {
 
-			for (TypedDependency t : td) {
-				if (t.reln().getShortName().equals("nsubj") && t.dep().originalText().equals(aspect)) {
-
-					x = t.gov().originalText();
-					for (TypedDependency t1 : td) {
-						if (t1.reln().getShortName().equals("acomp") && t1.gov().originalText().equals(x)) {
-							y = t.dep().originalText();
-//							System.out.println(aspect + " ****6 - " + y);
-							opinionWords.add(NegationUtil.setNegationForWord(y, td));
-							break;
+						x = t.gov().originalText();
+						for (TypedDependency t1 : td) {
+							if (t1.reln().getShortName().equals("acomp") && t1.gov().originalText().equals(x)) {
+								y = t.dep().originalText();
+								System.out.println(feature + " ****6 - " + y);
+								opinionWords.add(NegationUtil.setNegationForWord(y, td));
+								break;
+							}
 						}
 					}
 				}
