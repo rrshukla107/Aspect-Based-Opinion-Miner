@@ -20,6 +20,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import com.rahul.miner.algorithms.AdjectivesAlgorithms;
+import com.rahul.miner.algorithms.AdverbAlgorithmFamily;
 import com.rahul.miner.algorithms.AlgorithmFamily;
 import com.rahul.miner.aspect.Aspect;
 import com.rahul.miner.opinion_word_extractors.OpinionWord;
@@ -90,7 +91,7 @@ public class FeatureLevelMiningEngineTest {
 
 		CountDownLatch latch = new CountDownLatch(1);
 
-		this.engine = new FeatureLevelMiningEngine(List.of(new AdjectivesAlgorithms()), 4,
+		this.engine = new FeatureLevelMiningEngine(List.of(new AdjectivesAlgorithms(), new AdverbAlgorithmFamily()), 4,
 				LexicalizedParser.loadModel(grammar, options));
 
 		CompletableFuture<MiningResult> process = this.engine
@@ -103,7 +104,7 @@ public class FeatureLevelMiningEngineTest {
 		});
 
 		try {
-			latch.await(100000, TimeUnit.SECONDS);
+			latch.await();
 		} catch (InterruptedException e) {
 			fail();
 		}

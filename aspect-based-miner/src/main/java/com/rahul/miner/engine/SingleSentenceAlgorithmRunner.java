@@ -41,14 +41,22 @@ public class SingleSentenceAlgorithmRunner implements AlgorithmRunner {
 		List<CompletableFuture<List<OpinionWord>>> pendingExtractions = new ArrayList<>();
 
 		for (String s : sentences) {
+			
+			
+			
+			
+			
 
-			GrammaticalStructure structure = gsf.newGrammaticalStructure(parser.parse(s));
+			CompletableFuture.supplyAsync(() -> {
 
-			this.algorithm.getExtractors().forEach(extractor -> {
-				CompletableFuture<List<OpinionWord>> future = new CompletableFuture<>();
-				pendingExtractions.add(future);
-				this.executorService.execute(() -> future.complete(extractor.extract(aspect, structure)));
+				return gsf.newGrammaticalStructure(parser.parse(s));
+			}).thenAcceptAsync((structure) -> {
+				this.algorithm.getExtractors().forEach(extractor -> {
+					CompletableFuture<List<OpinionWord>> future = new CompletableFuture<>();
+					pendingExtractions.add(future);
+					this.executorService.execute(() -> future.complete(extractor.extract(aspect, structure)));
 
+				});
 			});
 
 		}
