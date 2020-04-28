@@ -41,6 +41,7 @@ public class FeatureLevelMiningEngine implements OpinionMiningEngine {
 
 		CompletableFuture<MiningResult> result = new CompletableFuture<>();
 
+		@SuppressWarnings("unchecked")
 		CompletableFuture<List<OpinionWord>>[] promises = IntStream.rangeClosed(0, sentences.size() - 1)
 				.mapToObj(i -> new CompletableFuture<List<OpinionWord>>()).collect(Collectors.toList())
 				.toArray(new CompletableFuture[sentences.size()]);

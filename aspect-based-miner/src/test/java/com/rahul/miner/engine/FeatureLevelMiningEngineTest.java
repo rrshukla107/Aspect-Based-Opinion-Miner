@@ -19,9 +19,10 @@ import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import com.rahul.miner.algorithms.AdjectivesAlgorithms;
-import com.rahul.miner.algorithms.AdverbAlgorithmFamily;
+import com.rahul.miner.algorithms.AdjectivesExtractionAlgorithmsFamily;
+import com.rahul.miner.algorithms.AdverbExtractionAlgorithmsFamily;
 import com.rahul.miner.algorithms.AlgorithmFamily;
+import com.rahul.miner.algorithms.VerbExtractionAlgorithmsFamily;
 import com.rahul.miner.aspect.Aspect;
 import com.rahul.miner.opinion_word_extractors.OpinionWord;
 
@@ -74,28 +75,30 @@ public class FeatureLevelMiningEngineTest {
 	@Test
 	public void test() throws IOException {
 
-		Preprocess preprocessor = new Preprocess(
-				"D:\\git\\Aspect-Based-Opinion-Miner\\aspect-based-miner\\src\\test\\resources\\Movie_Reviews.txt",
-				"D:\\git\\Aspect-Based-Opinion-Miner\\aspect-based-miner\\src\\test\\resources\\Movie_Reviews_Output.txt");
+//		Preprocess preprocessor = new Preprocess(
+//				"D:\\git\\Aspect-Based-Opinion-Miner\\aspect-based-miner\\src\\test\\resources\\Movie_Reviews.txt",
+//				"D:\\git\\Aspect-Based-Opinion-Miner\\aspect-based-miner\\src\\test\\resources\\Movie_Reviews_Output.txt");
 
 		File file = new File(
 				"D:\\git\\Aspect-Based-Opinion-Miner\\aspect-based-miner\\src\\test\\resources\\Movie_Reviews_Output.txt");
 
-		BufferedReader br = new BufferedReader(new FileReader(file));
-
 		List<String> lines = new ArrayList<String>();
-		String line;
-		while ((line = br.readLine()) != null) {
-			lines.add(line);
+		try (BufferedReader br = new BufferedReader(new FileReader(file));) {
+			String line;
+			while ((line = br.readLine()) != null) {
+				lines.add(line);
+			}
+
 		}
 
 		CountDownLatch latch = new CountDownLatch(1);
 
-		this.engine = new FeatureLevelMiningEngine(List.of(new AdjectivesAlgorithms(), new AdverbAlgorithmFamily()), 4,
+		this.engine = new FeatureLevelMiningEngine(List.of(new AdjectivesExtractionAlgorithmsFamily(),
+				new AdverbExtractionAlgorithmsFamily(), new VerbExtractionAlgorithmsFamily()), 4,
 				LexicalizedParser.loadModel(grammar, options));
 
 		CompletableFuture<MiningResult> process = this.engine
-				.process(new Aspect(Arrays.asList("acting", "direction", "cast")), lines);
+				.process(new Aspect(Arrays.asList("acting", "direction", "cast", "story")), lines);
 
 		process.thenAccept(miningResult -> {
 			assertEquals(12, miningResult.getOpinionWord().size());

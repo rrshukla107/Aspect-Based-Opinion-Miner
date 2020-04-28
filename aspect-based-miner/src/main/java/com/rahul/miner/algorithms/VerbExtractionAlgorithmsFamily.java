@@ -11,7 +11,7 @@ import com.rahul.miner.opinion_word_extractors.OpinionWordExtractor;
 import edu.stanford.nlp.trees.GrammaticalStructure;
 import edu.stanford.nlp.trees.TypedDependency;
 
-public class AdverbAlgorithmFamily implements AlgorithmFamily {
+public class VerbExtractionAlgorithmsFamily implements AlgorithmFamily {
 
 	@Override
 	public List<OpinionWordExtractor> getExtractors() {
@@ -22,12 +22,12 @@ public class AdverbAlgorithmFamily implements AlgorithmFamily {
 
 		@Override
 		public List<OpinionWord> extract(Aspect aspect, GrammaticalStructure gs) {
+
 			List<OpinionWord> opinionWords = new ArrayList<>();
 			Collection<TypedDependency> td = gs.allTypedDependencies();
 			String y = null;
 
 			for (String feature : aspect.getAspects()) {
-
 				for (TypedDependency t : td) {
 					if (t.reln().getShortName().equals("root") && t.gov().originalText().equals("")) {
 						y = t.dep().originalText();
@@ -35,7 +35,7 @@ public class AdverbAlgorithmFamily implements AlgorithmFamily {
 						for (TypedDependency t1 : td) {
 							if (t1.reln().getShortName().equals("nsubj") && t1.gov().originalText().equals(y)
 									&& t1.dep().originalText().equals(feature)) {
-								System.out.println(aspect + " #####1 - " + y);
+								System.out.println(feature + " #####1 - " + y);
 								opinionWords.add(NegationUtil.setNegationForWord(y, td));
 
 							}
@@ -43,13 +43,11 @@ public class AdverbAlgorithmFamily implements AlgorithmFamily {
 					}
 				}
 			}
-
 			return opinionWords;
 		}
 
 		@Override
 		public String getName() {
-
 			return "algo 1";
 		}
 
@@ -72,7 +70,7 @@ public class AdverbAlgorithmFamily implements AlgorithmFamily {
 									&& t1.dep().originalText().equals(feature))
 									|| (t1.reln().getShortName().equals("pobj") && t1.gov().originalText().equals(y)
 											&& t1.dep().originalText().equals(feature))) {
-								System.out.println(aspect + " #####2 - " + y);
+								System.out.println(feature + " #####2 - " + y);
 								opinionWords.add(NegationUtil.setNegationForWord(y, td));
 							}
 						}
@@ -85,12 +83,12 @@ public class AdverbAlgorithmFamily implements AlgorithmFamily {
 
 		@Override
 		public String getName() {
-			return "algo 2";
+			return "algo 1";
 		}
 
 	}
 
-	public class Algorithm3 implements OpinionWordExtractor {
+	private class Algorithm3 implements OpinionWordExtractor {
 
 		@Override
 		public List<OpinionWord> extract(Aspect aspect, GrammaticalStructure gs) {
@@ -107,7 +105,7 @@ public class AdverbAlgorithmFamily implements AlgorithmFamily {
 									&& t1.dep().originalText().equals(feature))
 									|| (t1.reln().getShortName().equals("xsubj") && t1.gov().originalText().equals(y)
 											&& t1.dep().originalText().equals(feature))) {
-								System.out.println(aspect + " #####3 - " + y);
+								System.out.println(feature + " #####3 - " + y);
 								opinionWords.add(NegationUtil.setNegationForWord(y, td));
 							}
 						}
@@ -120,7 +118,7 @@ public class AdverbAlgorithmFamily implements AlgorithmFamily {
 
 		@Override
 		public String getName() {
-			return "algo 3";
+			return "algo 1";
 		}
 
 	}
