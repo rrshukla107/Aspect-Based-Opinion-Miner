@@ -39,9 +39,9 @@ public class AspectBasedOpinionMiner {
 
 	public static void main(String[] args) throws IOException {
 
-//		Preprocess preprocessor = new Preprocess(
-//				"D:\\git\\Aspect-Based-Opinion-Miner\\aspect-based-miner\\src\\test\\resources\\Movie_Reviews.txt",
-//				"D:\\git\\Aspect-Based-Opinion-Miner\\aspect-based-miner\\src\\test\\resources\\Movie_Reviews_Output.txt");
+		// Add preprocessor
+
+		// Take input of the aspects
 
 		Aspect direction = new Aspect(List.of("direction", "director"));
 		Aspect script = new Aspect(List.of("script", "plot", "screenplay", "story"));
