@@ -1,6 +1,10 @@
 package com.rahul.miner.opinion_word_extractors;
 
-public class OpinionWord {
+import java.io.Serializable;
+
+public class OpinionWord implements Serializable {
+
+	private static final long serialVersionUID = 5570465974250126689L;
 
 	private String word;
 
@@ -33,6 +37,11 @@ public class OpinionWord {
 		int result = 1;
 		result = prime * result + ((word == null) ? 0 : word.hashCode());
 		return result;
+	}
+
+	@Override
+	public String toString() {
+		return this.isNegation ? word.toUpperCase() : word.toLowerCase();
 	}
 
 	@Override

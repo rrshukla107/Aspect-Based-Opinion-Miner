@@ -35,7 +35,7 @@ public final class JavaWordCount {
 
 	private static final Pattern SPACE = Pattern.compile(" ");
 
-	public static void main(String[] args) throws Exception {
+	public void main(String[] args) throws Exception {
 
 		logger.info("#############################");
 		logger.info("#############################");

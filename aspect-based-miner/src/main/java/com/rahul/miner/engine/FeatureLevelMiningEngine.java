@@ -69,11 +69,9 @@ public class FeatureLevelMiningEngine implements OpinionMiningEngine {
 		CompletableFuture.allOf(promises).thenAccept(promise -> {
 
 			List<OpinionWord> words = new ArrayList<>();
-
 			for (CompletableFuture<List<OpinionWord>> p : promises) {
 				words.addAll(p.join());
 			}
-
 			result.complete(this.createResult(words, aspect));
 
 		});
