@@ -98,7 +98,7 @@ public class FeatureLevelMiningEngineTest {
 				LexicalizedParser.loadModel(grammar, options));
 
 		CompletableFuture<MiningResult> process = this.engine
-				.process(new Aspect(Arrays.asList("acting", "direction", "cast", "story")), lines);
+				.process(new Aspect("acting", Arrays.asList("acting", "direction", "cast", "story")), lines);
 
 		process.thenAccept(miningResult -> {
 			assertEquals(12, miningResult.getOpinionWord().size());

@@ -43,9 +43,9 @@ public class AspectBasedOpinionMiner {
 
 		// Take input of the aspects
 
-		Aspect direction = new Aspect(List.of("direction", "director"));
-		Aspect script = new Aspect(List.of("script", "plot", "screenplay", "story"));
-		Aspect acting = new Aspect(List.of("actor", "actors", "acting"));
+		Aspect direction = new Aspect("direction", List.of("direction", "director"));
+		Aspect script = new Aspect("script", List.of("script", "plot", "screenplay", "story"));
+		Aspect acting = new Aspect("actor", List.of("actor", "actors", "acting"));
 
 		List<Aspect> aspects = List.of(direction, script, acting);
 
