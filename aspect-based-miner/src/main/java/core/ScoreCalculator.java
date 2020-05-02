@@ -7,6 +7,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 
+import com.rahul.miner.polarity.SentiWordNetDemoCode;
+
 
 public class ScoreCalculator {
 	private File positiveWords;

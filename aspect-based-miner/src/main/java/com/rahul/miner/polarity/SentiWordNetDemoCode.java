@@ -1,4 +1,4 @@
-package core;
+package com.rahul.miner.polarity;
 //    Copyright 2013 Petter T�rnberg
 //
 //    This demo code has been kindly provided by Petter T�rnberg <pettert@chalmers.se>

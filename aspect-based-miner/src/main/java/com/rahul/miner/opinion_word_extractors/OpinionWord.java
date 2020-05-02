@@ -27,7 +27,7 @@ public class OpinionWord implements Serializable {
 		this.word = word;
 	}
 
-	public Boolean getIsNegation() {
+	public Boolean hasNegation() {
 		return isNegation;
 	}
 
