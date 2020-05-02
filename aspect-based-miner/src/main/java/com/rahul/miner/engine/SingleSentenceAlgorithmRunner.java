@@ -41,11 +41,6 @@ public class SingleSentenceAlgorithmRunner implements AlgorithmRunner {
 		List<CompletableFuture<List<OpinionWord>>> pendingExtractions = new ArrayList<>();
 
 		for (String s : sentences) {
-			
-			
-			
-			
-			
 
 			CompletableFuture.supplyAsync(() -> {
 
@@ -54,7 +49,7 @@ public class SingleSentenceAlgorithmRunner implements AlgorithmRunner {
 				this.algorithm.getExtractors().forEach(extractor -> {
 					CompletableFuture<List<OpinionWord>> future = new CompletableFuture<>();
 					pendingExtractions.add(future);
-					this.executorService.execute(() -> future.complete(extractor.extract(aspect, structure)));
+//					this.executorService.execute(() -> future.complete(extractor.extract(aspect, structure)));
 
 				});
 			});

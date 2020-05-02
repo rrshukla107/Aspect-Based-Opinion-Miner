@@ -23,4 +23,9 @@ public class Aspect implements Serializable {
 		return aspectName;
 	}
 
+	@Override
+	public String toString() {
+		return this.aspectName + " | " + aspects;
+	}
+
 }

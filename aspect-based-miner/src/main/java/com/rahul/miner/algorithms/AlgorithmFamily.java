@@ -9,4 +9,8 @@ public interface AlgorithmFamily {
 
 	List<OpinionWordExtractor> getExtractors();
 
+	default String getName() {
+		return "";
+	}
+
 }

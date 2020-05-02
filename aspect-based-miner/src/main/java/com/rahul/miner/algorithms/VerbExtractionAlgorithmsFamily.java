@@ -1,14 +1,11 @@
 package com.rahul.miner.algorithms;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
-import com.rahul.miner.aspect.Aspect;
-import com.rahul.miner.opinion_word_extractors.OpinionWord;
 import com.rahul.miner.opinion_word_extractors.OpinionWordExtractor;
 
-import edu.stanford.nlp.trees.GrammaticalStructure;
 import edu.stanford.nlp.trees.TypedDependency;
 
 public class VerbExtractionAlgorithmsFamily implements AlgorithmFamily {
@@ -21,29 +18,27 @@ public class VerbExtractionAlgorithmsFamily implements AlgorithmFamily {
 	private class Algorithm1 implements OpinionWordExtractor {
 
 		@Override
-		public List<OpinionWord> extract(Aspect aspect, GrammaticalStructure gs) {
+		public Optional<String> extract(String feature, Collection<TypedDependency> td) {
 
-			List<OpinionWord> opinionWords = new ArrayList<>();
-			Collection<TypedDependency> td = gs.allTypedDependencies();
+			Optional<String> opinionWord = Optional.empty();
 			String y = null;
 
-			for (String feature : aspect.getAspects()) {
-				for (TypedDependency t : td) {
-					if (t.reln().getShortName().equals("root") && t.gov().originalText().equals("")) {
-						y = t.dep().originalText();
+			for (TypedDependency t : td) {
+				if (t.reln().getShortName().equals("root") && t.gov().originalText().equals("")) {
+					y = t.dep().originalText();
 
-						for (TypedDependency t1 : td) {
-							if (t1.reln().getShortName().equals("nsubj") && t1.gov().originalText().equals(y)
-									&& t1.dep().originalText().equals(feature)) {
-								System.out.println(feature + " #####1 - " + y);
-								opinionWords.add(NegationUtil.setNegationForWord(y, td));
-
-							}
+					for (TypedDependency t1 : td) {
+						if (t1.reln().getShortName().equals("nsubj") && t1.gov().originalText().equals(y)
+								&& t1.dep().originalText().equals(feature)) {
+							System.out.println(feature + " #####1 - " + y);
+							opinionWord = Optional.of(y);
+							break;
 						}
 					}
 				}
 			}
-			return opinionWords;
+
+			return opinionWord;
 		}
 
 		@Override
@@ -56,29 +51,29 @@ public class VerbExtractionAlgorithmsFamily implements AlgorithmFamily {
 	private class Algorithm2 implements OpinionWordExtractor {
 
 		@Override
-		public List<OpinionWord> extract(Aspect aspect, GrammaticalStructure gs) {
-			List<OpinionWord> opinionWords = new ArrayList<>();
-			Collection<TypedDependency> td = gs.allTypedDependencies();
+		public Optional<String> extract(String feature, Collection<TypedDependency> td) {
+
+			Optional<String> opinionWord = Optional.empty();
 			String y = null;
 
-			for (String feature : aspect.getAspects()) {
-				for (TypedDependency t : td) {
-					if (t.reln().getShortName().equals("root") && t.gov().originalText().equals("")) {
-						y = t.dep().originalText();
-						for (TypedDependency t1 : td) {
-							if ((t1.reln().getShortName().equals("dobj") && t1.gov().originalText().equals(y)
-									&& t1.dep().originalText().equals(feature))
-									|| (t1.reln().getShortName().equals("pobj") && t1.gov().originalText().equals(y)
-											&& t1.dep().originalText().equals(feature))) {
-								System.out.println(feature + " #####2 - " + y);
-								opinionWords.add(NegationUtil.setNegationForWord(y, td));
-							}
+			for (TypedDependency t : td) {
+				if (t.reln().getShortName().equals("root") && t.gov().originalText().equals("")) {
+					y = t.dep().originalText();
+					for (TypedDependency t1 : td) {
+						if ((t1.reln().getShortName().equals("dobj") && t1.gov().originalText().equals(y)
+								&& t1.dep().originalText().equals(feature))
+								|| (t1.reln().getShortName().equals("pobj") && t1.gov().originalText().equals(y)
+										&& t1.dep().originalText().equals(feature))) {
+							System.out.println(feature + " #####2 - " + y);
+							opinionWord = Optional.of(y);
+							break;
+
 						}
 					}
 				}
 			}
 
-			return opinionWords;
+			return opinionWord;
 		}
 
 		@Override
@@ -91,29 +86,27 @@ public class VerbExtractionAlgorithmsFamily implements AlgorithmFamily {
 	private class Algorithm3 implements OpinionWordExtractor {
 
 		@Override
-		public List<OpinionWord> extract(Aspect aspect, GrammaticalStructure gs) {
-			List<OpinionWord> opinionWords = new ArrayList<>();
-			Collection<TypedDependency> td = gs.allTypedDependencies();
+		public Optional<String> extract(String feature, Collection<TypedDependency> td) {
+
+			Optional<String> opinionWord = Optional.empty();
 			String y = null;
 
-			for (String feature : aspect.getAspects()) {
-				for (TypedDependency t : td) {
-					if (t.reln().getShortName().equals("root") && t.gov().originalText().equals("")) {
-						y = t.dep().originalText();
-						for (TypedDependency t1 : td) {
-							if ((t1.reln().getShortName().equals("nsubj_pass") && t1.gov().originalText().equals(y)
-									&& t1.dep().originalText().equals(feature))
-									|| (t1.reln().getShortName().equals("xsubj") && t1.gov().originalText().equals(y)
-											&& t1.dep().originalText().equals(feature))) {
-								System.out.println(feature + " #####3 - " + y);
-								opinionWords.add(NegationUtil.setNegationForWord(y, td));
-							}
+			for (TypedDependency t : td) {
+				if (t.reln().getShortName().equals("root") && t.gov().originalText().equals("")) {
+					y = t.dep().originalText();
+					for (TypedDependency t1 : td) {
+						if ((t1.reln().getShortName().equals("nsubj_pass") && t1.gov().originalText().equals(y)
+								&& t1.dep().originalText().equals(feature))
+								|| (t1.reln().getShortName().equals("xsubj") && t1.gov().originalText().equals(y)
+										&& t1.dep().originalText().equals(feature))) {
+							opinionWord = Optional.of(y);
+							break;
 						}
 					}
 				}
 			}
+			return opinionWord;
 
-			return opinionWords;
 		}
 
 		@Override
@@ -121,6 +114,11 @@ public class VerbExtractionAlgorithmsFamily implements AlgorithmFamily {
 			return "algo 1";
 		}
 
+	}
+
+	@Override
+	public String getName() {
+		return this.getClass().getName();
 	}
 
 }

@@ -53,9 +53,11 @@ public class FeatureLevelMiningEngine implements OpinionMiningEngine {
 					GrammaticalStructure structure = this.gsf
 							.newGrammaticalStructure(this.parser.parse(sentences.get(i)));
 					List<OpinionWord> collect = this.algorithms.stream()
-							.flatMap(algoFamily -> algoFamily.getExtractors().stream())
-							.map(extractor -> extractor.extract(aspect, structure)).flatMap(words -> words.stream())
-							.collect(Collectors.toList());
+							.flatMap(algoFamily -> algoFamily.getExtractors().stream()).map(extractor -> {
+								List<OpinionWord> words = extractor.getOpinionWords(aspect, structure);
+
+								return words;
+							}).flatMap(words -> words.stream()).collect(Collectors.toList());
 
 					promises[i].complete(collect);
 

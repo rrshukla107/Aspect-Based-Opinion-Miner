@@ -13,7 +13,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.rahul.miner.algorithms.AdjectivesExtractionAlgorithmsFamily;
-import com.rahul.miner.algorithms.AdverbExtractionAlgorithmsFamily;
 import com.rahul.miner.algorithms.VerbExtractionAlgorithmsFamily;
 import com.rahul.miner.aspect.Aspect;
 import com.rahul.miner.engine.FeatureLevelMiningEngine;
@@ -36,9 +35,8 @@ public class AspectBasedOpinionMiner {
 	private static String[] options = { "-maxLength", "80", "-retainTmpSubcategories" };
 
 	private static OpinionMiningEngine engine = new FeatureLevelMiningEngine(
-			List.of(new AdjectivesExtractionAlgorithmsFamily(), new AdverbExtractionAlgorithmsFamily(),
-					new VerbExtractionAlgorithmsFamily()),
-			4, LexicalizedParser.loadModel(grammar, options));
+			List.of(new AdjectivesExtractionAlgorithmsFamily(), new VerbExtractionAlgorithmsFamily()), 4,
+			LexicalizedParser.loadModel(grammar, options));
 
 	private static PolarityGenerator polarityGenerator = new PolarityGeneratorImpl(new File(
 			"D:\\git\\Aspect-Based-Opinion-Miner\\aspect-based-miner\\src\\main\\resources\\positive-words.txt"),

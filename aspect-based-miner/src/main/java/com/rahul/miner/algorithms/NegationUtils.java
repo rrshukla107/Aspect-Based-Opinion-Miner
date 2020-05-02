@@ -6,7 +6,7 @@ import com.rahul.miner.opinion_word_extractors.OpinionWord;
 
 import edu.stanford.nlp.trees.TypedDependency;
 
-public class NegationUtil {
+public class NegationUtils {
 
 	public static OpinionWord setNegationForWord(String word, Collection<TypedDependency> td) {
 		boolean negation = false;
