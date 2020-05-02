@@ -1,10 +1,9 @@
 package com.rahul.miner;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
@@ -21,6 +20,10 @@ import com.rahul.miner.engine.FeatureLevelMiningEngine;
 import com.rahul.miner.engine.MiningResult;
 import com.rahul.miner.engine.OpinionMiningEngine;
 import com.rahul.miner.opinion_word_extractors.OpinionWord;
+import com.rahul.miner.polarity.AspectScoreCalculator;
+import com.rahul.miner.polarity.AspectScoreCalculatorImpl;
+import com.rahul.miner.polarity.PolarityGenerator;
+import com.rahul.miner.polarity.PolarityGeneratorImpl;
 
 import edu.stanford.nlp.parser.lexparser.LexicalizedParser;
 import scala.Tuple2;
@@ -36,6 +39,14 @@ public class AspectBasedOpinionMiner {
 			List.of(new AdjectivesExtractionAlgorithmsFamily(), new AdverbExtractionAlgorithmsFamily(),
 					new VerbExtractionAlgorithmsFamily()),
 			4, LexicalizedParser.loadModel(grammar, options));
+
+	private static PolarityGenerator polarityGenerator = new PolarityGeneratorImpl(new File(
+			"D:\\git\\Aspect-Based-Opinion-Miner\\aspect-based-miner\\src\\main\\resources\\positive-words.txt"),
+			new File(
+					"D:\\git\\Aspect-Based-Opinion-Miner\\aspect-based-miner\\src\\main\\resources\\negative-words.txt"),
+			"D:\\git\\Aspect-Based-Opinion-Miner\\aspect-based-miner\\src\\main\\resources\\SentiWordNet_3.0.0.txt");
+
+	private static AspectScoreCalculator scoreCalculator = new AspectScoreCalculatorImpl(polarityGenerator);
 
 	public static void main(String[] args) throws IOException {
 
@@ -86,15 +97,21 @@ public class AspectBasedOpinionMiner {
 			return sentence1;
 		});
 
-		JavaRDD<Tuple2<Aspect, List<String>>> map = reduceByKey.map(aspectDetails -> {
+		JavaRDD<Tuple2<Aspect, List<OpinionWord>>> result = reduceByKey.map(aspectDetails -> {
 			logger.info("###################yosssssss");
 			MiningResult miningResult = engine.process(aspectDetails._1(), aspectDetails._2()).get();
-			List<String> opinionWord = miningResult.getOpinionWord().stream().map(OpinionWord::toString)
-					.collect(Collectors.toList());
-			return new Tuple2<Aspect, List<String>>(miningResult.getAspect(), opinionWord);
+			return new Tuple2<Aspect, List<OpinionWord>>(miningResult.getAspect(), miningResult.getOpinionWord());
+		});
+		result.saveAsTextFile("D:\\git\\Aspect-Based-Opinion-Miner\\aspect-based-miner\\TEST");
+
+		JavaPairRDD<Aspect, Double> mapToPair = result.mapToPair(aspectResults -> {
+
+			return new Tuple2<Aspect, Double>(aspectResults._1(),
+					scoreCalculator.calculateAspectScore(aspectResults._1(), aspectResults._2()));
 		});
 
-		map.saveAsTextFile("D:\\git\\Aspect-Based-Opinion-Miner\\aspect-based-miner\\TEST");
+		mapToPair.saveAsTextFile("D:\\git\\Aspect-Based-Opinion-Miner\\aspect-based-miner\\TEST2");
+
 		logger.info("###################yo");
 
 	}

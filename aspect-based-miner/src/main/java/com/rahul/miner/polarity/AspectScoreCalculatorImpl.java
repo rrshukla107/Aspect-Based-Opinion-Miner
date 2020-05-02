@@ -9,7 +9,7 @@ public class AspectScoreCalculatorImpl implements AspectScoreCalculator {
 
 	private PolarityGenerator polarityGenerator;
 
-	AspectScoreCalculatorImpl(PolarityGenerator polarityGenerator) {
+	public AspectScoreCalculatorImpl(PolarityGenerator polarityGenerator) {
 		this.polarityGenerator = polarityGenerator;
 
 	}
@@ -19,6 +19,7 @@ public class AspectScoreCalculatorImpl implements AspectScoreCalculator {
 		double sum = 0.0;
 		for (OpinionWord word : opinionWords) {
 			double wordPolarityScore = this.polarityGenerator.getPolarityScoreForWord(word.getWord());
+			System.out.println("Aspect - " + aspect.getAspectName() + "Word - " + word.getWord());
 			if (word.hasNegation()) {
 				sum += Math.ceil(10 - wordPolarityScore);
 			} else {
