@@ -1,0 +1,5 @@
+direction|director|directing|nolan|christopher
+script|plot|screenplay|story|movie|editing|writing|dialog|film|interstellar
+acting|actor|actor|actors|acting|actress|act
+soundtrack|score|background|music|effects|sound|hans|zimmer|song|songs|sounds
+cinematography|visual|visuals|effects|action|cinematography|costumes|filmmaker|photography|special|effect|shot|shooting|production

@@ -2,6 +2,8 @@ package com.rahul.miner;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,8 +15,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.rahul.miner.algorithms.AdjectivesExtractionAlgorithmsFamily;
+import com.rahul.miner.algorithms.FileAspectInputReader;
 import com.rahul.miner.algorithms.VerbExtractionAlgorithmsFamily;
 import com.rahul.miner.aspect.Aspect;
+import com.rahul.miner.aspect.AspectInputReader;
 import com.rahul.miner.engine.FeatureLevelMiningEngine;
 import com.rahul.miner.engine.MiningResult;
 import com.rahul.miner.engine.OpinionMiningEngine;
@@ -23,6 +27,7 @@ import com.rahul.miner.polarity.AspectScoreCalculator;
 import com.rahul.miner.polarity.AspectScoreCalculatorImpl;
 import com.rahul.miner.polarity.PolarityGenerator;
 import com.rahul.miner.polarity.PolarityGeneratorImpl;
+import com.rahul.miner.preprocessor.FilePreprocessor;
 
 import edu.stanford.nlp.parser.lexparser.LexicalizedParser;
 import scala.Tuple2;
@@ -46,25 +51,38 @@ public class AspectBasedOpinionMiner {
 
 	private static AspectScoreCalculator scoreCalculator = new AspectScoreCalculatorImpl(polarityGenerator);
 
-	public static void main(String[] args) throws IOException {
+	public static void main(String[] args) throws Exception {
 
 		// Add preprocessor
 
 		// Take input of the aspects
 
-		Aspect direction = new Aspect("direction", List.of("direction", "director"));
-		Aspect script = new Aspect("script", List.of("script", "plot", "screenplay", "story"));
-		Aspect acting = new Aspect("actor", List.of("actor", "actors", "acting"));
-
-		List<Aspect> aspects = List.of(direction, script, acting);
+//		Aspect direction = new Aspect("direction", List.of("direction", "director"));
+//		Aspect script = new Aspect("script", List.of("script", "plot", "screenplay", "story"));
+//		Aspect acting = new Aspect("actor", List.of("actor", "actors", "acting"));
+//
+//		List<Aspect> aspects = List.of(direction, script, acting);
 
 		SparkSession spark = SparkSession.builder().appName("AspectBasedOpinionMining").getOrCreate();
+
+		System.out.println("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
+
+		String reviewFilePath = args[0];
+		String aspectFilePath = args[1];
+		System.out.println("****************" + args[0]);
+
+		FilePreprocessor preproceesor = new FilePreprocessor();
+		String path = preproceesor.getSentences(args[0]);
+
 //		JavaRDD<String> lines = spark.read().textFile(args[0]).javaRDD();
 
-		JavaRDD<String> lines = spark.read().textFile(
-				"D:\\git\\Aspect-Based-Opinion-Miner\\aspect-based-miner\\src\\test\\resources\\Movie_Reviews_Output.txt"
-						+ "")
-				.javaRDD();
+		AspectInputReader reader = new FileAspectInputReader();
+		List<Aspect> aspects = reader.getAspects(new File(aspectFilePath));
+
+//		String string = spark.conf().get("REVIEW");
+//		System.out.println("****************" + string);
+
+		JavaRDD<String> lines = spark.read().textFile(path).javaRDD();
 
 		List<JavaPairRDD<Aspect, String>> aspectSentences = new ArrayList<>();
 

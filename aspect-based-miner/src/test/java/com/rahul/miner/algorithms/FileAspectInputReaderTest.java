@@ -2,7 +2,7 @@ package com.rahul.miner.algorithms;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import java.net.URI;
+import java.io.File;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
@@ -15,8 +15,7 @@ class FileAspectInputReaderTest {
 	@Test
 	void parseAspectfile() throws Exception {
 
-		URI uri = new URI(
-				"file:/D:/git/Aspect-Based-Opinion-Miner/aspect-based-miner/src/test/resources/sample_aspects");
+		File uri = new File("D:/git/Aspect-Based-Opinion-Miner/aspect-based-miner/src/test/resources/sample_aspects");
 		AspectInputReader reader = new FileAspectInputReader();
 		List<Aspect> aspects = reader.getAspects(uri);
 

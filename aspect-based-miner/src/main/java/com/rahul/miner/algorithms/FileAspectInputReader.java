@@ -22,9 +22,7 @@ public class FileAspectInputReader implements AspectInputReader {
 	// ASPECT_n|ASPECT_n_SYNONYM_1|ASPECT_n_SYNONYM_2|...|ASPECT_n_SYNONYM_m
 
 	@Override
-	public List<Aspect> getAspects(URI path) throws Exception {
-
-		File file = new File(path);
+	public List<Aspect> getAspects(File file) throws Exception {
 
 		String s;
 
