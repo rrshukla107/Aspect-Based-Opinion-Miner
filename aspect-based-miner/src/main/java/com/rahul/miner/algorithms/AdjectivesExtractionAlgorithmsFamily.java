@@ -29,7 +29,7 @@ public class AdjectivesExtractionAlgorithmsFamily implements AlgorithmFamily {
 						if (t1.reln().getShortName().equals("nsubj") && t1.gov().originalText().equals(y)) {
 							x = t1.dep().originalText();
 							if (x.equals("it") || x.equals(feature)) {
-								System.out.println(feature + " ****1 - " + y);
+//								System.out.println(feature + " ****1 - " + y);
 								opinionWord = Optional.of(y);
 								break;
 							}
@@ -43,7 +43,7 @@ public class AdjectivesExtractionAlgorithmsFamily implements AlgorithmFamily {
 
 		@Override
 		public String getName() {
-			return "algo 1";
+			return "Adjectives algo 1";
 		}
 
 	}
@@ -61,7 +61,7 @@ public class AdjectivesExtractionAlgorithmsFamily implements AlgorithmFamily {
 						|| t.reln().getShortName().equals("advmod")) {
 					if (t.gov().originalText().equals(feature)) {
 						y = t.dep().originalText().toString();
-						System.out.println(feature + " ****2.1 - " + y);
+//						System.out.println(feature + " ****2.1 - " + y);
 						opinionWord = Optional.of(y);
 						break;
 
@@ -74,7 +74,7 @@ public class AdjectivesExtractionAlgorithmsFamily implements AlgorithmFamily {
 
 		@Override
 		public String getName() {
-			return "algo 2";
+			return "Adjectives algo 2";
 		}
 
 	}
@@ -87,7 +87,7 @@ public class AdjectivesExtractionAlgorithmsFamily implements AlgorithmFamily {
 
 			for (TypedDependency t : td) {
 				if (t.reln().getShortName().equals("prep_like") && t.dep().originalText().equals(feature)) {
-					System.out.println(feature + " ****3 - " + "like");
+//					System.out.println(feature + " ****3 - " + "like");
 					opinionWord = Optional.of("like");
 
 				}
@@ -98,7 +98,7 @@ public class AdjectivesExtractionAlgorithmsFamily implements AlgorithmFamily {
 
 		@Override
 		public String getName() {
-			return "algo 3";
+			return "Adjectives algo 3";
 		}
 
 	}
@@ -107,7 +107,7 @@ public class AdjectivesExtractionAlgorithmsFamily implements AlgorithmFamily {
 
 		@Override
 		public String getName() {
-			return "algo 5";
+			return "Adjectives algo 5";
 		}
 
 		@Override
@@ -125,7 +125,7 @@ public class AdjectivesExtractionAlgorithmsFamily implements AlgorithmFamily {
 								&& t1.dep().originalText().equals(feature)) {
 							for (TypedDependency t2 : td) {
 								if (t2.reln().getShortName().equals("cop") && t2.gov().originalText().equals(y)) {
-									System.out.println(feature + " ****5 - " + y);
+//									System.out.println(feature + " ****5 - " + y);
 									opinionWord = Optional.of(y);
 								}
 								break;
@@ -143,7 +143,7 @@ public class AdjectivesExtractionAlgorithmsFamily implements AlgorithmFamily {
 
 		@Override
 		public String getName() {
-			return "algo 6";
+			return "Adjectives algo 6";
 		}
 
 		@Override
@@ -158,7 +158,7 @@ public class AdjectivesExtractionAlgorithmsFamily implements AlgorithmFamily {
 					for (TypedDependency t1 : td) {
 						if (t1.reln().getShortName().equals("acomp") && t1.gov().originalText().equals(x)) {
 							y = t.dep().originalText();
-							System.out.println(feature + " ****6 - " + y);
+//							System.out.println(feature + " ****6 - " + y);
 							opinionWord = Optional.of(y);
 							break;
 						}

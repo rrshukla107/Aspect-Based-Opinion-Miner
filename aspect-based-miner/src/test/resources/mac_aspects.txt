@@ -1,0 +1,9 @@
+display|screen|retina|colors|brightness|resolution|retina|xdr
+keyboard|layout|travel|backlit|key
+trackpad
+touchbar|touch|bar
+design|feel|build
+speaker|speakers|sound|volume|bass|audio
+heating|thermal|fan|noise|vent|vents
+battery|power|life|charger|charge
+performance|processors|processor|graphics|memory

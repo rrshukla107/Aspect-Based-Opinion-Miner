@@ -30,7 +30,7 @@ public class VerbExtractionAlgorithmsFamily implements AlgorithmFamily {
 					for (TypedDependency t1 : td) {
 						if (t1.reln().getShortName().equals("nsubj") && t1.gov().originalText().equals(y)
 								&& t1.dep().originalText().equals(feature)) {
-							System.out.println(feature + " #####1 - " + y);
+//							System.out.println(feature + " #####1 - " + y);
 							opinionWord = Optional.of(y);
 							break;
 						}
@@ -43,7 +43,7 @@ public class VerbExtractionAlgorithmsFamily implements AlgorithmFamily {
 
 		@Override
 		public String getName() {
-			return "algo 1";
+			return "Verb algo 1";
 		}
 
 	}
@@ -64,7 +64,7 @@ public class VerbExtractionAlgorithmsFamily implements AlgorithmFamily {
 								&& t1.dep().originalText().equals(feature))
 								|| (t1.reln().getShortName().equals("pobj") && t1.gov().originalText().equals(y)
 										&& t1.dep().originalText().equals(feature))) {
-							System.out.println(feature + " #####2 - " + y);
+//							System.out.println(feature + " #####2 - " + y);
 							opinionWord = Optional.of(y);
 							break;
 
@@ -78,7 +78,7 @@ public class VerbExtractionAlgorithmsFamily implements AlgorithmFamily {
 
 		@Override
 		public String getName() {
-			return "algo 1";
+			return "Verb algo 2";
 		}
 
 	}
@@ -111,7 +111,7 @@ public class VerbExtractionAlgorithmsFamily implements AlgorithmFamily {
 
 		@Override
 		public String getName() {
-			return "algo 1";
+			return "Verb algo 3";
 		}
 
 	}

@@ -1,5 +1,6 @@
 package com.rahul.miner.polarity;
 //    Copyright 2013 Petter T�rnberg
+
 //
 //    This demo code has been kindly provided by Petter T�rnberg <pettert@chalmers.se>
 //    for the SentiWordNet website.
@@ -115,26 +116,30 @@ public class SentiWordNetDemoCode {
 	}
 
 	public double extract(String word, String pos) {
-		//handle exception like bemoan.......and other terms which are not present
+		// handle exception like bemoan.......and other terms which are not present
 		try {
-			return dictionary.get(word + "#" + pos); 
-		} catch(NullPointerException exception) {
+			return dictionary.get(word + "#" + pos);
+		} catch (NullPointerException exception) {
 			return 0;
-		}finally {
-			
-		}
-		
-	}
-	/*
-	public static void main(String[] args) throws IOException {
-		
-		String pathToSWN = "/home/rahul/Documents/Project/home/swn/www/admin/dump/SentiWordNet_3.0.0_20130122.txt";
-		SentiWordNetDemoCode sentiwordnet = new SentiWordNetDemoCode(pathToSWN);
+		} finally {
 
-		System.out.println("good#a " + sentiwordnet.extract("abysmal", "a"));
-		System.out.println("bad#a " + sentiwordnet.extract("appalling", "a"));
-		System.out.println("blue#a " + sentiwordnet.extract("bemoan", "n"));
-		System.out.println("blue#n " + sentiwordnet.extract("neutral", "n"));
+		}
+
 	}
-	*/
+
+	/*
+	 * public static void main(String[] args) throws IOException {
+	 * 
+	 * String pathToSWN =
+	 * "D:\\git\\Aspect-Based-Opinion-Miner\\aspect-based-miner\\src\\main\\resources\\SentiWordNet_3.0.0.txt";
+	 * SentiWordNetDemoCode sentiwordnet = new SentiWordNetDemoCode(pathToSWN);
+	 * 
+	 * System.out.println("good#a " + sentiwordnet.extract("abysmal", "a"));
+	 * System.out.println("bad#a " + sentiwordnet.extract("appalling", "a"));
+	 * System.out.println("blue#a " + sentiwordnet.extract("bemoan", "n"));
+	 * System.out.println("blue#n " + sentiwordnet.extract("neutral", "n"));
+	 * 
+	 * System.out.println("score " + sentiwordnet.extract("gripping", "a")); }
+	 */
+
 }

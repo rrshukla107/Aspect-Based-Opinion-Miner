@@ -12,6 +12,7 @@ import java.util.stream.IntStream;
 import com.rahul.miner.algorithms.AlgorithmFamily;
 import com.rahul.miner.aspect.Aspect;
 import com.rahul.miner.opinion_word_extractors.OpinionWord;
+import com.rahul.miner.polarity.PolarityGenerator;
 
 import edu.stanford.nlp.parser.lexparser.LexicalizedParser;
 import edu.stanford.nlp.trees.GrammaticalStructure;
@@ -25,11 +26,14 @@ public class FeatureLevelMiningEngine implements OpinionMiningEngine {
 	private LexicalizedParser parser;
 	private GrammaticalStructureFactory gsf;
 	private TreebankLanguagePack tlp;
+	private PolarityGenerator polarityGenerator;
 
-	public FeatureLevelMiningEngine(List<AlgorithmFamily> algorithms, int numThreads, LexicalizedParser parser) {
+	public FeatureLevelMiningEngine(List<AlgorithmFamily> algorithms, int numThreads, LexicalizedParser parser,
+			PolarityGenerator polarityGenerator) {
 
 		this.algorithms = algorithms;
 		this.parser = parser;
+		this.polarityGenerator = polarityGenerator;
 		this.tlp = parser.getOp().langpack();
 		this.gsf = tlp.grammaticalStructureFactory();
 		this.executorService = Executors.newFixedThreadPool(numThreads);
@@ -50,11 +54,12 @@ public class FeatureLevelMiningEngine implements OpinionMiningEngine {
 
 			this.executorService.submit(() -> {
 				try {
-					GrammaticalStructure structure = this.gsf
-							.newGrammaticalStructure(this.parser.parse(sentences.get(i)));
+					String line = sentences.get(i);
+					GrammaticalStructure structure = this.gsf.newGrammaticalStructure(this.parser.parse(line));
 					List<OpinionWord> collect = this.algorithms.stream()
 							.flatMap(algoFamily -> algoFamily.getExtractors().stream()).map(extractor -> {
-								List<OpinionWord> words = extractor.getOpinionWords(aspect, structure);
+								List<OpinionWord> words = extractor.getOpinionWords(aspect, line, structure,
+										this.polarityGenerator);
 
 								return words;
 							}).flatMap(words -> words.stream()).collect(Collectors.toList());

@@ -37,12 +37,16 @@ public class PolarityGeneratorImpl implements PolarityGenerator {
 
 	}
 
-	private double getWordNetScore(String word) {
+	private Double getWordNetScore(String word) {
 		double score;
-		if ((score = wordNet.extract(word, ADJECTIVE)) == 0) {
+		if ((score = wordNet.extract(word, ADJECTIVE)) == 0D) {
 			score = wordNet.extract(word, NOUN);
 		}
 		return score;
+	}
+
+	public Boolean isEmotive(String word) {
+		return this.getWordNetScore(word) == 0D ? false : true;
 	}
 
 	@Override
