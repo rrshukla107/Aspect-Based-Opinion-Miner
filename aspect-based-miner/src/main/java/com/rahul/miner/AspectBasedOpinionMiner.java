@@ -10,6 +10,7 @@ import java.util.Properties;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
+import org.apache.spark.api.java.function.Function;
 import org.apache.spark.sql.SparkSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -70,27 +71,42 @@ public class AspectBasedOpinionMiner {
 		String aspectFilePath = args[1];
 
 		String preprocessedFile = FilePreprocessor.writeSentences(reviewFilePath);
+
 		List<Aspect> aspects = reader.getAspects(new File(aspectFilePath));
+
+		logger.info(" *** ASPECT BASED OPINION MINING STARTED *** ");
 		JavaRDD<String> lines = spark.read().textFile(preprocessedFile).javaRDD();
-		List<JavaPairRDD<Aspect, String>> aspectSentences = new ArrayList<>();
+		JavaPairRDD<Aspect, String> union = mapAspectToSentence(spark, aspects, lines);
+		JavaPairRDD<Aspect, List<String>> reduceByKey = reduceToFindSentencesForEachAspect(union);
+		JavaRDD<Tuple2<Aspect, List<OpinionWord>>> result = extractOpinionWordsForAspects(reduceByKey);
+		result.saveAsTextFile(OPINION_WORD_OUTPUT_DIRECTORY);
+		JavaPairRDD<Aspect, Double> mapToPair = calculateAspectScore(result);
+		mapToPair.saveAsTextFile(OPINION_WORD_SCORE_DIRECTORY);
+		logger.info(" *** ASPECT BASED OPINION MINING COMPLETE *** ");
 
-		for (Aspect aspect : aspects) {
+	}
 
-			aspectSentences.add(lines.filter(line -> {
+	private static JavaPairRDD<Aspect, Double> calculateAspectScore(JavaRDD<Tuple2<Aspect, List<OpinionWord>>> result) {
+		JavaPairRDD<Aspect, Double> mapToPair = result.mapToPair(aspectResults -> {
 
-				boolean result = false;
-				for (String feature : aspect.getAspects()) {
-					result = result || line.contains(feature);
-				}
-				return result;
+			return new Tuple2<Aspect, Double>(aspectResults._1(),
+					scoreCalculator.calculateAspectScore(aspectResults._1(), aspectResults._2()));
+		});
+		return mapToPair;
+	}
 
-			}).mapToPair(line -> new Tuple2<>(aspect, line)));
-		}
+	private static JavaRDD<Tuple2<Aspect, List<OpinionWord>>> extractOpinionWordsForAspects(
+			JavaPairRDD<Aspect, List<String>> reduceByKey) {
+		return reduceByKey.map(aspectDetails -> {
+			logger.info("OPINION MINING STARTED FOR ASPECT - " + aspectDetails._1());
+			MiningResult miningResult = engine.process(aspectDetails._1(), aspectDetails._2()).get();
+			return new Tuple2<Aspect, List<OpinionWord>>(miningResult.getAspect(), miningResult.getOpinionWord());
+		});
+	}
 
-		JavaPairRDD<Aspect, String> union = JavaSparkContext.fromSparkContext(spark.sparkContext())
-				.union(aspectSentences.toArray(new JavaPairRDD[aspectSentences.size()]));
-
-		JavaPairRDD<Aspect, List<String>> reduceByKey = union.mapToPair((tuple -> {
+	private static JavaPairRDD<Aspect, List<String>> reduceToFindSentencesForEachAspect(
+			JavaPairRDD<Aspect, String> union) {
+		JavaPairRDD<Aspect, List<String>> reduceByAspect = union.mapToPair((tuple -> {
 			List<String> list = new ArrayList<String>();
 			list.add(tuple._2());
 			return new Tuple2<Aspect, List<String>>(tuple._1(), list);
@@ -98,25 +114,31 @@ public class AspectBasedOpinionMiner {
 			sentence1.addAll(sentence2);
 			return sentence1;
 		});
+		return reduceByAspect;
+	}
 
-		JavaRDD<Tuple2<Aspect, List<OpinionWord>>> result = reduceByKey.map(aspectDetails -> {
-			logger.info("OPINION MINING STARTED FOR ASPECT - " + aspectDetails._1());
-			MiningResult miningResult = engine.process(aspectDetails._1(), aspectDetails._2()).get();
-			return new Tuple2<Aspect, List<OpinionWord>>(miningResult.getAspect(), miningResult.getOpinionWord());
-		});
-		
-		result.saveAsTextFile(OPINION_WORD_OUTPUT_DIRECTORY);
+	private static JavaPairRDD<Aspect, String> mapAspectToSentence(SparkSession spark, List<Aspect> aspects,
+			JavaRDD<String> lines) {
+		List<JavaPairRDD<Aspect, String>> aspectSentences = new ArrayList<>();
+		aspects.forEach(aspect -> aspectSentences
+				.add(lines.filter(containsAspect(aspect)).mapToPair(line -> new Tuple2<>(aspect, line))));
 
-		JavaPairRDD<Aspect, Double> mapToPair = result.mapToPair(aspectResults -> {
+		@SuppressWarnings("unchecked")
+		JavaPairRDD<Aspect, String> union = JavaSparkContext.fromSparkContext(spark.sparkContext())
+				.union(aspectSentences.toArray(new JavaPairRDD[aspectSentences.size()]));
+		return union;
+	}
 
-			return new Tuple2<Aspect, Double>(aspectResults._1(),
-					scoreCalculator.calculateAspectScore(aspectResults._1(), aspectResults._2()));
-		});
+	private static Function<String, Boolean> containsAspect(Aspect aspect) {
+		return line -> {
 
-		mapToPair.saveAsTextFile(OPINION_WORD_SCORE_DIRECTORY);
+			boolean result = false;
+			for (String feature : aspect.getAspects()) {
+				result = result || line.contains(feature);
+			}
+			return result;
 
-		logger.info("###################yo");
-
+		};
 	}
 
 	private static Properties initializeProperties() {

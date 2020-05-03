@@ -29,7 +29,7 @@ public class FilePreprocessor {
 				s = s.trim(); // trailing and starting spaces
 				s = s.replaceAll("\\s+", " "); // merging spaces
 
-				bw.append(s);
+				bw.append(s.toLowerCase());
 				bw.append("\n");
 				bw.flush();
 
