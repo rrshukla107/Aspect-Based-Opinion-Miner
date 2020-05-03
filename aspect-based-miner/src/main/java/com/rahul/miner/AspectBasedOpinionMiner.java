@@ -2,10 +2,10 @@ package com.rahul.miner;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
@@ -34,56 +34,44 @@ import scala.Tuple2;
 
 public class AspectBasedOpinionMiner {
 
+	private static final String POSITIVE_WORDS = "miner.positive_words_lexicon";
+	private static final String NEGATIVE_WORDS = "miner.negative_words_lexicon";
+	private static final String WORD_NET_PATH = "miner.sentiWordNet_path";
+	private static final String OPINION_WORD_OUTPUT_DIRECTORY = "miner.output.aspect.opinion_words";
+	private static final String OPINION_WORD_SCORE_DIRECTORY = "miner.output.aspect.scores";
+
+	private static final String CONFIGURATION = "miner_configuration.properties";
+	private static final Properties PROPERTIES = initializeProperties();
+
+	private static final String ASPECT_BASED_OPINION_MINING = "AspectBasedOpinionMining";
+
 	private static final Logger logger = LoggerFactory.getLogger(AspectBasedOpinionMiner.class);
 
-	private static String grammar = "edu/stanford/nlp/models/lexparser/englishPCFG.ser.gz";
-	private static String[] options = { "-maxLength", "80", "-retainTmpSubcategories" };
+	private static String GRAMMAR = "edu/stanford/nlp/models/lexparser/englishPCFG.ser.gz";
+	private static String[] OPTIONS = { "-maxLength", "80", "-retainTmpSubcategories" };
 
 	private static OpinionMiningEngine engine = new FeatureLevelMiningEngine(
 			List.of(new AdjectivesExtractionAlgorithmsFamily(), new VerbExtractionAlgorithmsFamily()), 4,
-			LexicalizedParser.loadModel(grammar, options));
+			LexicalizedParser.loadModel(GRAMMAR, OPTIONS));
 
-	private static PolarityGenerator polarityGenerator = new PolarityGeneratorImpl(new File(
-			"D:\\git\\Aspect-Based-Opinion-Miner\\aspect-based-miner\\src\\main\\resources\\positive-words.txt"),
-			new File(
-					"D:\\git\\Aspect-Based-Opinion-Miner\\aspect-based-miner\\src\\main\\resources\\negative-words.txt"),
-			"D:\\git\\Aspect-Based-Opinion-Miner\\aspect-based-miner\\src\\main\\resources\\SentiWordNet_3.0.0.txt");
+	private static PolarityGenerator polarityGenerator = new PolarityGeneratorImpl(
+			new File(PROPERTIES.getProperty(POSITIVE_WORDS)), new File(PROPERTIES.getProperty(NEGATIVE_WORDS)),
+			PROPERTIES.getProperty(WORD_NET_PATH));
 
 	private static AspectScoreCalculator scoreCalculator = new AspectScoreCalculatorImpl(polarityGenerator);
 
+	private static AspectInputReader reader = new FileAspectInputReader();
+
 	public static void main(String[] args) throws Exception {
 
-		// Add preprocessor
-
-		// Take input of the aspects
-
-//		Aspect direction = new Aspect("direction", List.of("direction", "director"));
-//		Aspect script = new Aspect("script", List.of("script", "plot", "screenplay", "story"));
-//		Aspect acting = new Aspect("actor", List.of("actor", "actors", "acting"));
-//
-//		List<Aspect> aspects = List.of(direction, script, acting);
-
-		SparkSession spark = SparkSession.builder().appName("AspectBasedOpinionMining").getOrCreate();
-
-		System.out.println("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
+		SparkSession spark = SparkSession.builder().appName(ASPECT_BASED_OPINION_MINING).getOrCreate();
 
 		String reviewFilePath = args[0];
 		String aspectFilePath = args[1];
-		System.out.println("****************" + args[0]);
 
-		FilePreprocessor preproceesor = new FilePreprocessor();
-		String path = preproceesor.getSentences(args[0]);
-
-//		JavaRDD<String> lines = spark.read().textFile(args[0]).javaRDD();
-
-		AspectInputReader reader = new FileAspectInputReader();
+		String preprocessedFile = FilePreprocessor.writeSentences(reviewFilePath);
 		List<Aspect> aspects = reader.getAspects(new File(aspectFilePath));
-
-//		String string = spark.conf().get("REVIEW");
-//		System.out.println("****************" + string);
-
-		JavaRDD<String> lines = spark.read().textFile(path).javaRDD();
-
+		JavaRDD<String> lines = spark.read().textFile(preprocessedFile).javaRDD();
 		List<JavaPairRDD<Aspect, String>> aspectSentences = new ArrayList<>();
 
 		for (Aspect aspect : aspects) {
@@ -99,8 +87,6 @@ public class AspectBasedOpinionMiner {
 			}).mapToPair(line -> new Tuple2<>(aspect, line)));
 		}
 
-//		JavaSparkContext.fromSparkContext(spark.sparkContext());
-
 		JavaPairRDD<Aspect, String> union = JavaSparkContext.fromSparkContext(spark.sparkContext())
 				.union(aspectSentences.toArray(new JavaPairRDD[aspectSentences.size()]));
 
@@ -114,11 +100,12 @@ public class AspectBasedOpinionMiner {
 		});
 
 		JavaRDD<Tuple2<Aspect, List<OpinionWord>>> result = reduceByKey.map(aspectDetails -> {
-			logger.info("###################yosssssss");
+			logger.info("OPINION MINING STARTED FOR ASPECT - " + aspectDetails._1());
 			MiningResult miningResult = engine.process(aspectDetails._1(), aspectDetails._2()).get();
 			return new Tuple2<Aspect, List<OpinionWord>>(miningResult.getAspect(), miningResult.getOpinionWord());
 		});
-		result.saveAsTextFile("D:\\git\\Aspect-Based-Opinion-Miner\\aspect-based-miner\\TEST");
+		
+		result.saveAsTextFile(OPINION_WORD_OUTPUT_DIRECTORY);
 
 		JavaPairRDD<Aspect, Double> mapToPair = result.mapToPair(aspectResults -> {
 
@@ -126,9 +113,22 @@ public class AspectBasedOpinionMiner {
 					scoreCalculator.calculateAspectScore(aspectResults._1(), aspectResults._2()));
 		});
 
-		mapToPair.saveAsTextFile("D:\\git\\Aspect-Based-Opinion-Miner\\aspect-based-miner\\TEST2");
+		mapToPair.saveAsTextFile(OPINION_WORD_SCORE_DIRECTORY);
 
 		logger.info("###################yo");
 
+	}
+
+	private static Properties initializeProperties() {
+		String resourceName = CONFIGURATION;
+		ClassLoader loader = Thread.currentThread().getContextClassLoader();
+		Properties props = new Properties();
+		try (InputStream resourceStream = loader.getResourceAsStream(resourceName)) {
+			props.load(resourceStream);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		return props;
 	}
 }

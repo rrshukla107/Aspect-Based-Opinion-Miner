@@ -15,7 +15,7 @@ import edu.stanford.nlp.process.DocumentPreprocessor;
 
 public class FilePreprocessor {
 
-	public static String getSentences(String inputFile) throws Exception {
+	public static String writeSentences(String inputFile) throws Exception {
 		DocumentPreprocessor dp = new DocumentPreprocessor(inputFile);
 
 		String path = "sentences";
