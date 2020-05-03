@@ -50,7 +50,7 @@ public class PolarityGeneratorImpl implements PolarityGenerator {
 		// EXPERIMENT HERE...!!
 		double score = 0;
 		if (positive.contains(word)) {
-			score += 6;
+			score += 7;
 		} else if (negative.contains(word)) {
 			score += 3;
 		} else {
@@ -60,7 +60,7 @@ public class PolarityGeneratorImpl implements PolarityGenerator {
 			if (wordNetScore > 0) {
 				score += 2;
 			} else if (wordNetScore < 0) {
-				score -= 2;
+				score -= 1;
 			}
 		}
 

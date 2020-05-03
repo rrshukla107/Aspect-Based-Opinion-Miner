@@ -76,12 +76,14 @@ public class AspectBasedOpinionMiner {
 
 		logger.info(" *** ASPECT BASED OPINION MINING STARTED *** ");
 		JavaRDD<String> lines = spark.read().textFile(preprocessedFile).javaRDD();
-		JavaPairRDD<Aspect, String> union = mapAspectToSentence(spark, aspects, lines);
-		JavaPairRDD<Aspect, List<String>> reduceByKey = reduceToFindSentencesForEachAspect(union);
-		JavaRDD<Tuple2<Aspect, List<OpinionWord>>> result = extractOpinionWordsForAspects(reduceByKey);
-		result.saveAsTextFile(OPINION_WORD_OUTPUT_DIRECTORY);
-		JavaPairRDD<Aspect, Double> mapToPair = calculateAspectScore(result);
-		mapToPair.saveAsTextFile(OPINION_WORD_SCORE_DIRECTORY);
+		JavaPairRDD<Aspect, String> aspectSentencesMapping = mapAspectToSentence(spark, aspects, lines);
+		JavaPairRDD<Aspect, List<String>> sentencesForAspect = reduceToFindSentencesForEachAspect(
+				aspectSentencesMapping);
+		JavaRDD<Tuple2<Aspect, List<OpinionWord>>> opinonWordsForAspect = extractOpinionWordsForAspects(
+				sentencesForAspect);
+		opinonWordsForAspect.saveAsTextFile(OPINION_WORD_OUTPUT_DIRECTORY);
+		JavaPairRDD<Aspect, Double> aspectScores = calculateAspectScore(opinonWordsForAspect);
+		aspectScores.saveAsTextFile(OPINION_WORD_SCORE_DIRECTORY);
 		logger.info(" *** ASPECT BASED OPINION MINING COMPLETE *** ");
 
 	}
