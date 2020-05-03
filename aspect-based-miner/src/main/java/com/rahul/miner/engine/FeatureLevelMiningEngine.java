@@ -43,27 +43,32 @@ public class FeatureLevelMiningEngine implements OpinionMiningEngine {
 	@Override
 	public CompletableFuture<MiningResult> process(Aspect aspect, List<String> sentences) {
 
+		// THIS PROMISE IS RETURNED TO THE CALLER 
 		CompletableFuture<MiningResult> result = new CompletableFuture<>();
 
+		// CREATING A PROMISE FOR EACH SENTENCES
 		@SuppressWarnings("unchecked")
 		CompletableFuture<List<OpinionWord>>[] promises = IntStream.rangeClosed(0, sentences.size() - 1)
 				.mapToObj(i -> new CompletableFuture<List<OpinionWord>>()).collect(Collectors.toList())
 				.toArray(new CompletableFuture[sentences.size()]);
 
 		IntStream.rangeClosed(0, promises.length - 1).forEach(i -> {
-
+			// FOR EVERY SENTENCE WE SUBMIT A JOB IN THREAD POOL TO EXTRACT OPINION WORDS
 			this.executorService.submit(() -> {
 				try {
 					String line = sentences.get(i);
 					GrammaticalStructure structure = this.gsf.newGrammaticalStructure(this.parser.parse(line));
+					
 					List<OpinionWord> collect = this.algorithms.stream()
 							.flatMap(algoFamily -> algoFamily.getExtractors().stream()).map(extractor -> {
+								// EXTRACTING ALL THE OPINION WORDS FROM THE EXTRACTORS
 								List<OpinionWord> words = extractor.getOpinionWords(aspect, line, structure,
 										this.polarityGenerator);
 
 								return words;
 							}).flatMap(words -> words.stream()).collect(Collectors.toList());
 
+					// COMPLETING THE SENTENCE PROMISE
 					promises[i].complete(collect);
 
 				} catch (Exception e) {
@@ -73,16 +78,20 @@ public class FeatureLevelMiningEngine implements OpinionMiningEngine {
 			});
 		});
 
+		// WAITING FOR ALL THE SENTENCES TO BE PROCESSED
 		CompletableFuture.allOf(promises).thenAccept(promise -> {
 
 			List<OpinionWord> words = new ArrayList<>();
 			for (CompletableFuture<List<OpinionWord>> p : promises) {
 				words.addAll(p.join());
 			}
+			// CREATING THE RESULT AND COMPLETING THE RESULT PROMISE 
 			result.complete(this.createResult(words, aspect));
 
 		});
 
+		
+		// RETURNING THE PROMISE TO THE CALLER
 		return result;
 
 	}

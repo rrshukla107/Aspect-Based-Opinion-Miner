@@ -65,24 +65,42 @@ public class AspectBasedOpinionMiner {
 
 	public static void main(String[] args) throws Exception {
 
+		// STARTING THE SPARK SESSION
 		SparkSession spark = SparkSession.builder().appName(ASPECT_BASED_OPINION_MINING).getOrCreate();
 
+		// READING THE INPUT FILE PATHS
 		String reviewFilePath = args[0];
 		String aspectFilePath = args[1];
 
+		// PREPROCESSING THE INPUT FILE TO CREATE A NEW PREPROCESSED FILE
 		String preprocessedFile = FilePreprocessor.writeSentences(reviewFilePath);
 
+		// PREPARING THE ASPECTS FROM THE INPUT ASPECT FILE
 		List<Aspect> aspects = ASPECT_READER.getAspects(new File(aspectFilePath));
 
+		// STARTING OPINION MINING USING SPARK
 		logger.info(" *** ASPECT BASED OPINION MINING STARTED *** ");
+		
+		// READING THE REVIEWS IN A RDD
 		JavaRDD<String> lines = spark.read().textFile(preprocessedFile).javaRDD();
+		
+		// MAP OPERATION TO EMIT ** O/P - <ASPECT, SENTENCE CONTAINING THE ASPECT>
 		JavaPairRDD<Aspect, String> aspectSentencesMapping = mapAspectToSentence(spark, aspects, lines);
+		
+		// REDUCING TO FIND THE SENTENCES TO ANALYZE FOR EACH ASPECT ** O/P - <ASPECT, <SENTENCES>>
 		JavaPairRDD<Aspect, List<String>> sentencesForAspect = reduceToFindSentencesForEachAspect(
 				aspectSentencesMapping);
+		
+		// PERFORMING ASPECT BASED OPINION MINING FOR EACH ASPECT ** O/P - <ASPECT, <OPINION WORDS>>
 		JavaRDD<Tuple2<Aspect, List<OpinionWord>>> opinonWordsForAspect = extractOpinionWordsForAspects(
 				sentencesForAspect);
+		// PERSISTING THE OPINION WORDS IN THE DIRECTORY SPECIFIED IN CONFIGURATION PROPERTIES
 		opinonWordsForAspect.saveAsTextFile(OPINION_WORD_OUTPUT_DIRECTORY);
+		
+		// CALCULATING THE SCORES FOR EACH ASPECT WITH THE HELP OF POLARITY SCORE OF OPINION WORDS ** O/P - <ASPECT, SCORE>
 		JavaPairRDD<Aspect, Double> aspectScores = calculateAspectScore(opinonWordsForAspect);
+		
+		// PERSISTING THE SCORES IN THE DIRECTORY SPECIFIED IN CONFIGURATION PROPERTIES
 		aspectScores.saveAsTextFile(OPINION_WORD_SCORE_DIRECTORY);
 		logger.info(" *** ASPECT BASED OPINION MINING COMPLETE *** ");
 

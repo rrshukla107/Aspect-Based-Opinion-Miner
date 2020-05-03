@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<class-diagram version="1.2.4" icons="true" always-add-relationships="false" generalizations="false" realizations="true" 
-  associations="true" dependencies="false" nesting-relationships="true" router="FAN">  
+<class-diagram version="1.2.4" icons="true" automaticImage="JPEG" always-add-relationships="false" 
+  generalizations="false" realizations="true" associations="true" dependencies="false" nesting-relationships="true" 
+  router="FAN">  
   <class id="1" language="java" name="com.rahul.miner.AspectBasedOpinionMiner" project="aspect-based-miner" 
     file="/aspect-based-miner/src/main/java/com/rahul/miner/AspectBasedOpinionMiner.java" binary="false" 
     corner="BOTTOM_RIGHT">    
