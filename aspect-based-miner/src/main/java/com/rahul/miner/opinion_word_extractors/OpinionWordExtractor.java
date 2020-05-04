@@ -41,9 +41,9 @@ public interface OpinionWordExtractor {
 					LOGGER.info("**Feature - " + feature + " **ALGO - " + this.getName() + " **OpinionWord - " + opinion
 							+ " **Sentence - " + line);
 
-					opinionWords.add(NegationUtils.setNegationForWord(opinion, td));
+					opinionWords.add(NegationUtils.setNegationForWord(opinion, td, polarityGenerator));
 
-					AdverbUtils.getAdverbs(feature, opinion, td).forEach(verb -> {
+					AdverbUtils.getAdverbs(feature, opinion, td, polarityGenerator).forEach(verb -> {
 						if (polarityGenerator.isEmotive(verb.getWord())) {
 							opinionWords.add(verb);
 						}

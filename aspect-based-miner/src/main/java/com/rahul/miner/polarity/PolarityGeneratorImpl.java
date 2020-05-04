@@ -73,4 +73,17 @@ public class PolarityGeneratorImpl implements PolarityGenerator {
 		return score;
 	}
 
+	@Override
+	public Boolean isNegative(String word) {
+
+		if (negative.contains(word)) {
+			return true;
+		}
+		if (this.getWordNetScore(word) < 0) {
+			return true;
+		}
+
+		return false;
+	}
+
 }

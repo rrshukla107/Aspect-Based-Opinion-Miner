@@ -139,7 +139,7 @@ public class SentiWordNetDemoCode {
 	 * System.out.println("blue#a " + sentiwordnet.extract("bemoan", "n"));
 	 * System.out.println("blue#n " + sentiwordnet.extract("neutral", "n"));
 	 * 
-	 * System.out.println("score " + sentiwordnet.extract("gripping", "a")); }
+	 * System.out.println("score " + sentiwordnet.extract("bad", "a")); }
 	 */
 
 }
