@@ -97,14 +97,14 @@ public class AspectBasedOpinionMiner {
 		JavaPairRDD<Aspect, List<OpinionWord>> opinonWordsForAspect = extractOpinionWordsForAspects(sentencesForAspect);
 		// PERSISTING THE OPINION WORDS IN THE DIRECTORY SPECIFIED IN CONFIGURATION
 		// PROPERTIES
-		opinonWordsForAspect.saveAsTextFile(OPINION_WORD_OUTPUT_DIRECTORY);
+		opinonWordsForAspect.saveAsTextFile(PROPERTIES.getProperty(OPINION_WORD_OUTPUT_DIRECTORY));
 
 		// CALCULATING THE SCORES FOR EACH ASPECT WITH THE HELP OF POLARITY SCORE OF
 		// OPINION WORDS ** O/P - <ASPECT, SCORE>
 		JavaPairRDD<Aspect, Double> aspectScores = calculateAspectScore(opinonWordsForAspect);
 
 		// PERSISTING THE SCORES IN THE DIRECTORY SPECIFIED IN CONFIGURATION PROPERTIES
-		aspectScores.saveAsTextFile(OPINION_WORD_SCORE_DIRECTORY);
+		aspectScores.saveAsTextFile(PROPERTIES.getProperty(OPINION_WORD_SCORE_DIRECTORY));
 		logger.info(" *** ASPECT BASED OPINION MINING COMPLETE *** ");
 
 	}
